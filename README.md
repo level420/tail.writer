@@ -1,88 +1,206 @@
 tail.writer
 ============
+> Version: 0.3.0 (Alpha)<br />
+> License: X11 / MIT<br />
+> Author: SamBrishes, pytesNET
 
-A light-weight and powerful GitHub Flavored Markdown editor for MooTools >= 1.4.5 and jQuery >= 1.8.0.
+A light-weight, powerful and Open Source GitHub Flavored Markdown editor, written in pure vanilla
+JavaScript with a jQuery and a MooTools implementation.
 
-![Screenshot](https://raw.githubusercontent.com/pytesNET/tail.writer/master/Docs/tail.writer.png)
+[Demonstration](https://pytesNET.github.io/tail.writer/) |
+[Browser Unit Text](https://github.com/pytesNET/tail.writer/BROWSERTEST.md)
+
 
 How to use
 ----------
+```javascript
+// Vanilla Edition
+    document.addEventListener("DOMContentLoaded", function(){
+        var options = { /* Your Options */ };
 
-The Syntax for MooTools and jQuery are the same:
+        // Just use an CSS Selector...
+        tail.writer(".my-tail-editor", options);
 
-    <script type="text/javascript">
-        // MooTools Style
-        window.addEvent("domready", function(){
-            $("my-textarea").tailWriter({option: value})
-            $$("my-textareas").tailWriter({option: value})
-        });
-        
-        // jQuery Style
-        jQuery(window).ready(function(){
-            $("#my-textarea").tailWriter({option: value})
-            $(".my-textareas").tailWriter({option: value})
-        })
-    </script>
-	
+        // ... or an Element
+        tail.writer(document.getElementById("tail-editor"), options);
+    });
+
+// jQuery Edition
+    jQuery(document).ready(function(){
+        var options = { /* Your Options */ };
+
+        // The known jQuery method
+        jQuery(".my-tail-editor").tailWriter(options);
+    });
+
+// MooTools Edition
+    window.addEvent("domready", function(){
+        var options = { /* Your Options */ };
+
+        // Single Selector
+        $("my-textarea").tailWriter(options);
+
+        // Multi Selector
+        $$("my-textareas").tailWriter(options);
+    });
+```
+
 Available Options
 -----------------
+```javascript
+tailWriter.defaults = {
+    width:            "100%",
+    height:           ["200px", "500px"],
+    classes:          "",
+    resize:           true,
+    indentTab:        false,
+    indentSize:       4,
+    toolbar:          [
+        "headers", "|", "bold", "italic", "strikethrough", "|", "quote", "code",
+        "codeblock", "indent", "outdent", "|", "link", "image", "table", "hr", "|",
+        "list:unordered", "list:ordered", "|", "preview"
+    ],
+    tooltip:          "top",
+    statusbar:        true
+};
+```
+| Title         | Type          | Description |
+| ------------- |:-------------:| ----------- |
+| width         | ``string``    | Defines the width of the tail.writer container. |
+| height        | ``array``     | Defines the height of the tail.writer container used as [minHeight, maxHeight]. The maxHeight parameter is used for the `resize` function. |
+| classes       | ``string``    | Adds additional, custom class names to the tail.writer container element. |
+| resize        | ``boolean``   | Set this to `true` to adapt the height of the textarea field to the content, limited to the `height` option. |
+| indentTab     | ``boolean``   | Set this to `true` to use Tabs (`\t`) for indenting, and `false` to use spaces (depending on `indentSize`). |
+| indentSize    | ``integer``   | Defines the number of spaces for each indent step, requires `indentTab: false`! |
+| toolbar       | ``array``     | Defines the actions / buttons within the shown toolbar. |
+| tooltip       | ``string``    | Defines the position of the action / button tooltip position (use `false` to disable the tooltips). |
+| statusbar     | ``boolean``   | Set this to `true` to enable the statusbar, which shows meta informations / counter data. |
 
--	`width` (string): Defines the width of the object and editor.
--	`height` (array): Defines the [min-height, max-height] of the editor.
--	`classes` (string|array): Adds additional class names to the tail.writer object.
--	`resize` (bool): True to enable the resize function, False to disable it.
--	`toolbar` (array): Defines the single action buttons (See below).
--	`indent_tab` (bool): True to use a single tab, False to use spaces.
--	`indent_size` (int): Defines the number of spaces, if indent_tab is false.
--	`action_header1` (bool): True to use "======", False to use a single "#".
--	`action_header2` (bool): True to use "------", False to use "##".
--	`action_bold` (string): The markdown token for bold (Default: "**").
--	`action_italic` (string): The markdown token for italic (Default: "_").
--	`tooltip_show` (bool): True to enable the action tooltips, False to disable it.
--	`statusbar_show` (bool): True to enable the statusbar, False to disable it.
 
 Available Toolbar Buttons
 -------------------------
+The new toolbar action API allows to set arguments after the action name, separated with a colon:
+`<action_name>:<param1>[,<param2>]`. A concrete example of this shows the single header action:
+`header:3`, which creates a toolbar action button which inserts a `### ` (aka `<h3></h3>`) markup.
 
-**Valid GFM Actions (Direct Insert)**
+### Header
+```javascript
+Action:     "header:<size>"
+Markup:     "$1\n==========" | "$1\n----------" | "# $1"
+Arguments:  <size:int>
+```
+Shows a single header action button, use a `size` between `1` and `6` (for `<h1>` ... `<h6>` respectively).
 
--	`header-1`: Shown as `# `
--	`header-2`: Shown as `## `
--	`header-3`: Shown as `### `
--	`header-4`: Shown as `#### `
--	`header-5`: Shown as `##### `
--	`header-6`: Shown as `###### `
--	`bold`: Shown as `**`
--	`italic`: Shown as `_`
--	`strikethrough`: Shown as `~~`
--	`code-inline`: Shown as `` ` ``
--	`link`: Shown as `[Title](url)`
--	`image`: Shown as `![Title](url)`
--	`hr`: Shown as `-----`
--	`quote`: Shown as `>`
--	`code-block`: Shown as ` ``` ``` `
--	`list-unordered`: Shown as `-`
--	`list-ordered`: Shown as `1.`
--	`list-checked`: Shown as `- [x]`
--	`list-unchecked`: Shown as `- [ ]`
+### Headers (Dropdown)
+```javascript
+Action:     "headers:<type>"
+Markup:     "$1\n==========" | "$1\n----------" | "# $1"
+Arguments:  <type:string>
+```
+Shows all or just 3 (use `"x3"` as `type` argument) header variants within a Dropdown field.
 
+### Bold
+```javascript
+Action:     "bold"
+Markup:     "**$1**"
+Arguments:  null
+```
 
-**Valid GFM Actions (Shown as Dropdown)**
+### Italic
+```javascript
+Action:     "italic"
+Markup:     "_$1_"
+Arguments:  null
+```
 
--	`header`: Select a header between 1 - 6.
--	`header-x3`: Select a header between 1 - 3.
--	`table`: Enter the number of rows and columns.
+### Underline
+```javascript
+Action:     "underline"
+Markup:     "<u>$1</u>"
+Arguments:  null
+```
 
-**Valid GFM Actions (Shown as Dialog)**
+### Strikethrough
+```javascript
+Action:     "strikethough"
+Markup:     "~~$1~~"
+Arguments:  null
+```
 
--	`link-dialog`: Enter the url and title for the link.
--	`image-dialog`: Enter the url ajnd title for the image.
--	`table-dialog`: Enter the number of rows and columns.
+### Inline Code
+```javascript
+Action:     "code"
+Markup:     "`$1`"
+Arguments:  null
+```
 
-**Special Actions**
+### Horizontal Rule
+```javascript
+Action:     "hr"
+Markup:     "----------"
+Arguments:  null
+```
 
--	`|`: Just a separator between the buttons.
--	`underline`: Shown as HTML "&lt;u&gt;&lt;/u&gt;".
--	`indent`: Just a replacement for the "Tab" -key.
--	`outdent`: Just a replacement for the "Shift+Tab" -key.
--	`preview`: Changes the textarea with a preview container.
+### Pre Clode Block
+```javascript
+Action:     "codeblock"
+Markup:     "```\n$1\n```"
+Arguments:  null
+```
+
+### Blockquote
+```javascript
+Action:     "quote"
+Markup:     ">\t$1"
+Arguments:  null
+```
+
+### List
+```javascript
+Action:     "list:<type>"
+Markup:     "-\t$1" | "1.\t$1" | "- [ ]\t$1" | "- [x]\t$1"
+Arguments:  <type:string>
+```
+Creates a List use `"unordered"`, `"ordered"`, `"unchecked"` or `"checked"` as type argument to
+configure the list.
+
+### Link
+```javascript
+Action:     "link:<type>"
+Markup:     "[$1](url)"
+Arguments:  <type:string>
+```
+Creates a clickable Hyperlink, use `"dropdown"` or `"dialog"` as `type` argument to create a Dropdown
+or Dialog box or use no argument to just insert the respective marup!
+
+### Image
+```javascript
+Action:     "image:<type>"
+Markup:     "![$1](url)"
+Arguments:  <type:string>
+```
+Creates a Image Link / Embed, use `"dropdown"` or `"dialog"` as `type` argument to create a Dropdown
+or Dialog box or use no argument to just insert the respective marup!
+
+### Table
+```javascript
+Action:     "table:<type>"
+Markup:     "![$1](url)"
+Arguments:  <type:string>
+```
+Creates a Table Structure, use `"dropdown"` or `"dialog"` as `type` argument to create a Dropdown or
+Dialog box.
+
+### Indent
+```javascript
+Action:     "indent"
+Markup:     "\t$1"
+Arguments:  null
+```
+
+### Outdent
+```javascript
+Action:     "outdent"
+Markup:     null
+Arguments:  null
+```
