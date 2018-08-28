@@ -10,6 +10,9 @@ JavaScript with a jQuery and a MooTools implementation.
 [Demonstration](https://pytesNET.github.io/tail.writer/) |
 [Browser Unit Text](https://github.com/pytesNET/tail.writer/BROWSERTEST.md)
 
+Work in Progress
+----------------
+The script is still Work in Progress!
 
 How to use
 ----------
@@ -204,3 +207,11 @@ Action:     "outdent"
 Markup:     null
 Arguments:  null
 ```
+
+### Preview
+```javascript
+Action:     "preview"
+Markup:     null
+Arguments:  null
+```
+Parses the Markdown Markup content, requires [marked](https://github.com/markedjs/marked).

@@ -317,21 +317,21 @@
 .tail-writer-object{
     padding-top: 35px;
     border-color: #505458;
-	background-color: #202428;
+    background-color: #202428;
 }
 .tail-writer-object .tail-writer-editor{
-	color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.75);
     background-color: #303438;
-	border-top-color: #404448;
-	border-bottom-color: #404448;
+    border-top-color: #404448;
+    border-bottom-color: #404448;
 }
 .tail-writer-object .tail-writer-tooltip{
-	color: #303438;
+    color: #303438;
     margin: -17px 0 0 0;
-	background-color: #ffffff;
+    background-color: #ffffff;
 }
 .tail-writer-object .tail-writer-tooltip:after{
-	border-color: #ffffff transparent transparent transparent;
+    border-color: #ffffff transparent transparent transparent;
 }
 
 /* @jump TOOLBAR */
@@ -339,14 +339,14 @@
     top: 0;
     left: 0;
     right: 0;
-	background-color: transparent;
-	border-color: transparent;
+    background-color: transparent;
+    border-color: transparent;
 }
 .tail-writer-toolbar > span{
-	border-left-color: rgba(255, 255, 255, 0.2);
+    border-left-color: rgba(255, 255, 255, 0.2);
 }
 .tail-writer-toolbar > button{
-	color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.3);
     width: 35px;
     height: 35px;
 }
@@ -356,20 +356,20 @@
 
 /* @jump DIALOG AND DROPDOWN */
 .tail-writer-mask{
-	background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.25);
 }
 .tail-writer-dialog, .tail-writer-dropdown{
-	background-color: #101418;
-	border-color: #505458;
-	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
-	-moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
-	-webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
+    background-color: #101418;
+    border-color: #505458;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
+    -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
+    -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
 }
 .tail-writer-dropdown:after{
-	border-color: transparent transparent #101418 transparent;
+    border-color: transparent transparent #101418 transparent;
 }
 .tail-writer-dropdown:before{
-	border-color: transparent transparent #505458 transparent;
+    border-color: transparent transparent #505458 transparent;
 }
 .tail-writer-dialog button, .tail-writer-dropdown button{
     border-color: #E12D87;
@@ -407,44 +407,44 @@
 
 /* @jump STATUSBAR */
 .tail-writer-statusbar{
-	color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.5);
 }
 
 /* @jump PREVIEW PLUGIN */
 .tail-writer-object .tail-writer-preview{
-	color: rgba(255, 255, 255, 0.85);
-	background-color: #202428;
-	border-top-color: transparent;
-	border-bottom-color: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    background-color: #202428;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
 }
 .tail-writer-preview h1, .tail-writer-preview h2, .tail-writer-preview h3,
 .tail-writer-preview h4, .tail-writer-preview h5, .tail-writer-preview h6{
-	color: rgba(255, 255, 255, 0.95);
+    color: rgba(255, 255, 255, 0.95);
 }
 .tail-writer-preview h1, .tail-writer-preview h2{
-	border-bottom-color: rgba(255, 255, 255, 0.2);
+    border-bottom-color: rgba(255, 255, 255, 0.2);
 }
 .tail-writer-preview code{
-	color: rgba(255, 255, 255, 0.95);
-	background-color: #101418;
+    color: rgba(255, 255, 255, 0.95);
+    background-color: #101418;
 }
 .tail-writer-preview pre{
-	color: rgba(255, 255, 255, 0.95);
-	background-color: #101418;
+    color: rgba(255, 255, 255, 0.95);
+    background-color: #101418;
 }
 .tail-writer-preview table{
-	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
-	-moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
-	-webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
+    -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
+    -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.45);
 }
 .tail-writer-preview table tr th,
 .tail-writer-preview table tr td{
-	background-color: #303438;
-	border-color: #505458;
+    background-color: #303438;
+    border-color: #505458;
 }
 .tail-writer-preview table thead tr td,
 .tail-writer-preview table thead tr th,
 .tail-writer-preview table tbody tr:nth-child(2) td,
 .tail-writer-preview table tbody tr:nth-child(2) th{
-	background-color: #202428;
+    background-color: #202428;
 }

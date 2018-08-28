@@ -262,13 +262,13 @@
 /* @jump CORE DESIGN */
 .tail-writer-object, .tail-writer-object *{
     font-family: Arial, sans-serif;
-	box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 .tail-writer-object input::-moz-focus-inner{
-	padding: 0; /* Firefox Fix */
-	border: 0; /* Firefox Fix */
+    padding: 0; /* Firefox Fix */
+    border: 0; /* Firefox Fix */
 }
 .tail-writer-object input[type="text"], .tail-writer-object input[type="number"]{
     width: 150px;
@@ -338,23 +338,23 @@
 }
 
 .tail-writer-object button::-moz-focus-inner{
-	padding: 0; /* Firefox Fix */
-	border: 0; /* Firefox Fix */
+    padding: 0; /* Firefox Fix */
+    border: 0; /* Firefox Fix */
 }
 .tail-writer-object button{
-	color: #333333;
-	width: auto;
-	cursor: pointer;
-	margin: 0;
-	padding: 0;
-	display: inline-block;
-	overflow: visible;	/* IE Fix */
-	position: relative;
-	text-align: center;
+    color: #333333;
+    width: auto;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    overflow: visible;    /* IE Fix */
+    position: relative;
+    text-align: center;
     line-height: 30px;
-	vertical-align: top;
-	background-color: transparent;
-	outline: none;
+    vertical-align: top;
+    background-color: transparent;
+    outline: none;
     border-width: 1px;
     border-style: solid;
     border-color: transparent;
@@ -363,9 +363,9 @@
     -webkit-border-radius: 3px;
 }
 .tail-writer-object button:hover, .tail-writer-object button.hover{
-	color: #000000;
+    color: #000000;
     border-color: #c0c0c0;
-	background-color: #ffffff;
+    background-color: #ffffff;
     box-shadow: 0 1px 1px #e0e0e0;
     -moz-box-shadow: 0 1px 1px #e0e0e0;
     -webkit-box-shadow: 0 1px 1px #e0e0e0;
@@ -379,92 +379,92 @@
     -webkit-box-shadow: inset 0 1px 1px #d0d0d0;
 }
 .tail-writer-object button:disabled, .tail-writer-object button.disabled{
-	color: #cccccc;
-	cursor: not-allowed;
+    color: #cccccc;
+    cursor: not-allowed;
     border-color: transparent;
-	background-color: transparent;
+    background-color: transparent;
 }
 .tail-writer-object{
-	display: block;
-	padding: 50px 0 25px 0;
-	position: relative;
-	background-color: #ffffff;
+    display: block;
+    padding: 50px 0 25px 0;
+    position: relative;
+    background-color: #ffffff;
     border-width: 1px;
     border-style: solid;
     border-color: #cccccc;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
 }
 .tail-writer-object .tail-writer-editor{
-	width: 100%;
-	margin: 0;
-	padding: 10px;
-	resize: none;
-	display: block;
-	font-size: 14px;
-	line-height: 22px;
-	background-color: #ffffff;
-	outline: none;
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    resize: none;
+    display: block;
+    font-size: 14px;
+    line-height: 22px;
+    background-color: #ffffff;
+    outline: none;
     border-width: 1px 0 1px 0;
     border-style: solid;
     border-color: #cccccc;
 }
 .tail-writer-object .tail-writer-editor:hover,
 .tail-writer-object .tail-writer-editor:focus{
-	box-shadow: none;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
 }
 .tail-writer-object .tail-writer-tooltip{
-	color: #ffffff;
-	margin: -10px 0 0 0;
-	padding: 2px 5px;
-	z-index: 55;
-	display: block;
-	position: absolute;
-	font-size: 10px;
-	line-height: 12px;
-	white-space: nowrap;
-	background-color: #222222;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
+    color: #ffffff;
+    margin: -10px 0 0 0;
+    padding: 2px 5px;
+    z-index: 55;
+    display: block;
+    position: absolute;
+    font-size: 10px;
+    line-height: 12px;
+    white-space: nowrap;
+    background-color: #222222;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
 }
 .tail-writer-object .tail-writer-tooltip:after{
-	left: 50%;
-	bottom: -5px;
-	width: 0;
-	height: 0;
-	margin: 0 0 0 -5px;
-	padding: 0;
-	content: "";
-	position: absolute;
-	border-style: solid;
-	border-width: 5px 5px 0 5px;
-	border-color: #222222 transparent transparent transparent;
+    left: 50%;
+    bottom: -5px;
+    width: 0;
+    height: 0;
+    margin: 0 0 0 -5px;
+    padding: 0;
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-width: 5px 5px 0 5px;
+    border-color: #222222 transparent transparent transparent;
 }
 
 /* @jump TOOLBAR */
 .tail-writer-toolbar{
-	top: 7px;
-	left: 7px;
-	right: 7px;
-	height: 35px;
-	margin: 0;
-	padding: 0;
-	display: block;
-	position: absolute;
-	background-color: #ffffff;
-	vertical-align: top;
+    top: 7px;
+    left: 7px;
+    right: 7px;
+    height: 35px;
+    margin: 0;
+    padding: 0;
+    display: block;
+    position: absolute;
+    background-color: #ffffff;
+    vertical-align: top;
 }
 .tail-writer-toolbar > span{
-	width: 1px;
-	height: 20px;
-	margin: 7px 3px 0 3px;
-	padding: 0;
-	display: inline-block;
-	vertical-align: top;
+    width: 1px;
+    height: 20px;
+    margin: 7px 3px 0 3px;
+    padding: 0;
+    display: inline-block;
+    vertical-align: top;
     border-width: 0 0 0 1px;
     border-style: solid;
     border-color: #cccccc;
@@ -486,56 +486,56 @@
 
 /* @jump DIALOG AND DROPDOWN */
 .tail-writer-mask{
-	width: 100%;
-	height: 100%;
-	z-index: 35;
-	background-color: rgba(0, 0, 0, 0.15);
+    width: 100%;
+    height: 100%;
+    z-index: 35;
+    background-color: rgba(0, 0, 0, 0.15);
 }
 .tail-writer-dialog, .tail-writer-dropdown{
-	display: block;
-	position: relative;
-	background-color: #ffffff;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.05);
-	-moz-box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.05);
-	-webkit-box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.05);
+    display: block;
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.05);
+    -webkit-box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.05);
 }
 .tail-writer-dialog{
-	margin: 0;
-	padding: 10px;
-	z-index: 40;
-	text-align: center;
+    margin: 0;
+    padding: 10px;
+    z-index: 40;
+    text-align: center;
 }
 .tail-writer-dropdown{
-	margin: 7px 0 0 0;
-	padding: 5px;
-	z-index: 15;
-	text-align: center;
-	white-space: nowrap;
+    margin: 7px 0 0 0;
+    padding: 5px;
+    z-index: 15;
+    text-align: center;
+    white-space: nowrap;
     border-width: 1px;
     border-style: solid;
     border-color: #cccccc;
 }
 .tail-writer-dropdown:before, .tail-writer-dropdown:after{
-	top: -8px;
-	left: 8px;
-	width: 0;
-	height: 0;
-	margin: 0;
-	content: "";
-	display: block;
-	position: absolute;
-	border-style: solid;
-	border-width: 0 7.5px 8px 7.5px;
-	border-color: transparent transparent #ffffff transparent;
+    top: -8px;
+    left: 8px;
+    width: 0;
+    height: 0;
+    margin: 0;
+    content: "";
+    display: block;
+    position: absolute;
+    border-style: solid;
+    border-width: 0 7.5px 8px 7.5px;
+    border-color: transparent transparent #ffffff transparent;
 }
 .tail-writer-dropdown:before{
-	top: -10px;
-	left: 7px;
-	border-width: 0 8.5px 10px 8.5px;
-	border-color: transparent transparent #cccccc transparent;
+    top: -10px;
+    left: 7px;
+    border-width: 0 8.5px 10px 8.5px;
+    border-color: transparent transparent #cccccc transparent;
 }
 .tail-writer-dialog button, .tail-writer-dropdown button{
     height: 26px;
@@ -610,25 +610,25 @@
 
 /* @jump STATUSBAR */
 .tail-writer-statusbar{
-	color: #777777;
-	width: 100%;
-	height: 20px;
-	margin: 0;
-	padding: 5px 0;
-	display: block;
-	z-index: 10;
-	position: absolute;
-	font-size: 10px;
-	line-height: 15px;
-	vertical-align: top;
+    color: #777777;
+    width: 100%;
+    height: 20px;
+    margin: 0;
+    padding: 5px 0;
+    display: block;
+    z-index: 10;
+    position: absolute;
+    font-size: 10px;
+    line-height: 15px;
+    vertical-align: top;
 }
 .tail-writer-statusbar div{
-	margin: 0;
-	padding: 0 10px;
-	display: inline-block;
+    margin: 0;
+    padding: 0 10px;
+    display: inline-block;
 }
 .tail-writer-statusbar div:last-child{
-	float: right;
+    float: right;
 }
 .tail-writer-statusbar div .current{
     color: #3296C8;
@@ -636,108 +636,108 @@
 
 /* @jump PREVIEW */
 .tail-writer-object .tail-writer-preview{
-	margin: 0;
-	padding: 10px 15px;
-	display: block;
-	resize: none;
-	font-size: 14px;
-	line-height: 22px;
-	border: none;
-	outline: none;
-	overflow-x: hidden;
-	overflow-y: auto;
-	background-color: #ffffff;
+    margin: 0;
+    padding: 10px 15px;
+    display: block;
+    resize: none;
+    font-size: 14px;
+    line-height: 22px;
+    border: none;
+    outline: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #ffffff;
     border-width: 1px 0;
     border-style: solid;
     border-color: #cccccc;
 }
 .tail-writer-preview h1, .tail-writer-preview h2, .tail-writer-preview h3,
 .tail-writer-preview h4, .tail-writer-preview h5, .tail-writer-preview h6{
-	color: #555555;
-	margin: 10px 0;
-	padding: 3px 10px;
-	font-weight: bold;
+    color: #555555;
+    margin: 10px 0;
+    padding: 3px 10px;
+    font-weight: bold;
 }
 .tail-writer-preview h1{
-	font-size: 24px;
-	line-height: 28px;
+    font-size: 24px;
+    line-height: 28px;
     border-width: 0 0 1px 0;
     border-style: solid;
     border-color: #eaeaea;
 }
 .tail-writer-preview h2{
-	font-size: 22px;
-	line-height: 26px;
+    font-size: 22px;
+    line-height: 26px;
     border-width: 0 0 1px 0;
     border-style: solid;
     border-color: #eaeaea;
 }
 .tail-writer-preview h3{
-	font-size: 20px;
-	line-height: 24px;
+    font-size: 20px;
+    line-height: 24px;
 }
 .tail-writer-preview h4{
-	font-size: 18px;
-	line-height: 20px;
+    font-size: 18px;
+    line-height: 20px;
 }
 .tail-writer-preview h5{
-	font-size: 16px;
-	line-height: 20px;
+    font-size: 16px;
+    line-height: 20px;
 }
 .tail-writer-preview h6{
-	color: #888888;
-	font-size: 16px;
-	font-style: italic;
-	line-height: 20px;
+    color: #888888;
+    font-size: 16px;
+    font-style: italic;
+    line-height: 20px;
 }
 .tail-writer-preview a{
-	color: #618BA9;
-	text-decoration: none;
+    color: #618BA9;
+    text-decoration: none;
 }
 .tail-writer-preview a:hover{
-	text-decoration: underline;
+    text-decoration: underline;
 }
 .tail-writer-preview ul, .tail-writer-preview ol{
-	padding: 0 0 0 20px;
-	list-style: initial;
+    padding: 0 0 0 20px;
+    list-style: initial;
 }
 .tail-writer-preview ol{
-	list-style-type: decimal;
+    list-style-type: decimal;
 }
 .tail-writer-preview code{
-	padding: 2px 3px;
-	font-size: 12px;
-	line-height: 14px;
-	font-family: monospace;
-	background-color: rgb(245, 245, 255);
+    padding: 2px 3px;
+    font-size: 12px;
+    line-height: 14px;
+    font-family: monospace;
+    background-color: rgb(245, 245, 255);
 }
 .tail-writer-preview pre{
-	margin: 0;
-	padding: 10px 15px;
-	font-size: 12px;
-	line-height: 14px;
-	font-family: monospace;
-	background-color: rgb(245, 245, 255);
+    margin: 0;
+    padding: 10px 15px;
+    font-size: 12px;
+    line-height: 14px;
+    font-family: monospace;
+    background-color: rgb(245, 245, 255);
 }
 .tail-writer-preview pre code{
-	padding: none;
-	background-color: transparent;
+    padding: none;
+    background-color: transparent;
 }
 .tail-writer-preview table{
-	width: auto;
-	margin: 15px 0;
-	border-spacing: 0;
-	border-collapse: collapse;
+    width: auto;
+    margin: 15px 0;
+    border-spacing: 0;
+    border-collapse: collapse;
 }
 .tail-writer-preview table tr th,
 .tail-writer-preview table tr td{
-	padding: 7px 12px;
-	text-align: left;
+    padding: 7px 12px;
+    text-align: left;
     border-width: 1px;
     border-style: solid;
     border-color: #e0e0e0;
 }
 .tail-writer-preview table tbody tr:nth-child(2) td,
 .tail-writer-preview table tbody tr:nth-child(2) th{
-	background-color: #f8f8f8;
+    background-color: #f8f8f8;
 }
