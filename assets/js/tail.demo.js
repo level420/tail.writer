@@ -1,6 +1,6 @@
 (function(){
 	"use strict";
-	
+
 	document.addEventListener("DOMContentLoaded", function(){
 		/*
 		 |	WIDGET CONTENT SWITCH
@@ -13,14 +13,14 @@
 					string		= this.getAttribute("title").split("|"),
 					option		= this.getAttribute("data-option").split("|"),
 					icon		= this.children[0].getAttribute("data-icon");
-				
+
 				for(var i = 0; i < articles.length; i++){
 					if(articles[i].className === option[0]){
 						articles[i].style.display = "block";
 					} else {
 						articles[i].style.display = "none";
 					}
-					
+
 				}
 				this.setAttribute("title", string[1] + "|" + string[0]);
 				this.setAttribute("data-option", option[1] + "|" + option[0]);
@@ -33,6 +33,6 @@
 				action[i].click();
 			}
 		}
-		
+
 	});
 })(window, document);

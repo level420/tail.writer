@@ -1,6 +1,6 @@
 tail.writer
 ============
-> Version: 0.3.0 (Alpha)<br />
+> Version: 0.3.1 (Alpha)<br />
 > License: X11 / MIT<br />
 > Author: SamBrishes, pytesNET
 
