@@ -1,0 +1,20 @@
+{
+    "name": "tail.writer",
+    "version": "0.3.1",
+    "description": "A light-weight, powerful and configurable Open Source GitHub Flavored Markdown editor, written in pure vanilla JavaScript! ",
+    "main": "js/tail.writer.js",
+    "scripts": { },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/pytesNET/tail.writer.git"
+    },
+    "keywords": [
+        "markdown-editor", "markdown", "editor", "writer", "gfm", "tail"
+    ],
+    "author": "SamBrishes, pytesNET",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/pytesNET/tail.writer/issues"
+    },
+    "homepage": "https://github.com/pytesNET/tail.writer#readme"
+}

@@ -1,7 +1,7 @@
 /*
  |  tail.writer - A small GitHub Flavored Markdown editor, written in vanillaJS!
  |  @author     SamBrishes@pytesNET
- |  @version    0.3.0 [0.3.0] - Alpha
+ |  @version    0.3.1 [0.3.0] - Alpha
  |
  |  @license    X11 / MIT License
  |  @copyright  Copyright © 2015 - 2018 SamBrishes, pytesNET <pytes@gmx.net>
@@ -11,7 +11,6 @@
 
     /*
      |  HELPER METHODs
-     |  @version    0.3.0 [0.3.0]
      */
     var tail = {
         hasClass: function(element, classname){
@@ -46,6 +45,15 @@
             }
             return position;
         },
+        trigger: function(element, event, options){
+            if(CustomEvent && typeof(CustomEvent) !== "undefined"){
+                var e = new CustomEvent(event, options);
+                return element.dispatchEvent(e);
+            }
+            var e = d.createEvent("CustomEvent");
+            e.initCustomEvent(event, ((options.bubbles)? true: false), ((options.cancelable)? true: false), options.detail);
+            return element.dispatchEvent(e);
+        },
         animate: function(element, callback, delay, prevent){
             if(element.hasAttribute("data-tail-animation")){
                 if(!prevent){
@@ -70,7 +78,8 @@
 
     /*
      |  CONSTRUCTOR
-     |  @version    0.3.0 [0.2.0]
+     |  @since  0.2.0
+     |  @update 0.3.0
      */
     var tailWriter = function(element, config){
         if(typeof(element) == "string"){
@@ -113,7 +122,7 @@
         return this;
     }
     tailWriter.status = "alpha";
-    tailWriter.version = "0.3.0";
+    tailWriter.version = "0.3.1";
 
     // Instances
     tailWriter.counter = 0;
@@ -567,7 +576,8 @@
 
     /*
      |  API :: MARKDOWN PARSER
-     |  @version    0.3.0 [0.3.0]
+     |  @since  0.3.0
+     |  @update 0.3.0
      */
     tailWriter.parse = function(content){
         if(typeof(marked) == "undefined"){
@@ -590,7 +600,8 @@
 
     /*
      |  API :: EXTEND ACTION BUTTON
-     |  @version    0.3.0 [0.2.0]
+     |  @since  0.2.0
+     |  @update 0.3.0
      */
     tailWriter.extend = function(type, action, strings){
         if(tailWriter.actions.hasOwnProperty(type)){
@@ -624,7 +635,8 @@
 
         /*
          |  INSTANCE :: BUILD EDITOR
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         build: function(){
             var self = this; this.read();
@@ -739,7 +751,8 @@
 
         /*
          |  HANDLE :: EDITOR
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.1
          */
         handle: function(event){
             var self = this; this.read();
@@ -792,12 +805,12 @@
 
                 // Enter
                 if(event.keyCode == 13){
-                    event.preventDefault();
                     if(this.walkable(this.lines.current)){
+                        event.preventDefault();
                         this.writeLine(this.indenter("", "create"));
                         return this.perform(this.walk[0], this.walk[1]);
                     }
-                    return this.writeLine(this.indenter("\n", "create"));
+                    return true;
                 }
             }
 
@@ -812,7 +825,8 @@
 
         /*
          |  HANDLE :: CHECK FOR AN WALKABLE CONTINUE
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         walkable: function(string){
             if(!this.walk || string == undefined){
@@ -837,7 +851,8 @@
 
         /*
          |  HANDLE :: TOOLTIPs
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         tooltip: function(event, element){
             if(this.con.tooltip == false){
@@ -898,7 +913,8 @@
 
         /*
          |  HANDLE :: RESIZE
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         resize: function(scroll){
             var clone   = this.e.editor.cloneNode(),
@@ -928,7 +944,8 @@
 
         /*
          |  HANDLE :: STATUSBAR
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         statusbar: function(action){
             var data = {
@@ -970,7 +987,8 @@
 
         /*
          |  HELPER :: (G|S)ET SELECTION
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         selection: function(start, end){
             if(start == undefined){
@@ -989,7 +1007,8 @@
 
         /*
          |  HELPER :: INDENTER
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         indenter: function(string, action){
             if(this.con.indentTab){
@@ -1030,7 +1049,8 @@
 
         /*
          |  CORE :: READ CONTENT
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         read: function(){
             this.val = this.indenter(this.e.editor.value);
@@ -1051,7 +1071,8 @@
 
         /*
          |  CORE :: WRITE CONTENT
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         write: function(content, selection){
             this.e.editor.value = content;
@@ -1063,7 +1084,8 @@
 
         /*
          |  CORE :: WRITE LINE
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         writeLine: function(line, handle){
             var sel = this.selection(),
@@ -1089,7 +1111,8 @@
 
         /*
          |  CORE :: SHOW DROPDOWN
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         showDropdown: function(type, content, callback){
             var self = this;
@@ -1129,7 +1152,8 @@
 
         /*
          |  CORE :: HIDE DROPDOWN
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         hideDropdown: function(){
             var removed = new Array(),
@@ -1152,7 +1176,8 @@
 
         /*
          |  CORE :: SHOW DIALOG
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         showDialog: function(type, content, callback){
             var self = this;
@@ -1214,7 +1239,8 @@
 
         /*
          |  CORE :: HIDE DIALOG
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         hideDialog: function(){
             var removed = new Array(),
@@ -1249,7 +1275,8 @@
 
         /*
          |  CORE :: REMOVE TAIL.WRITER
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         remove: function(){
             this.e.container.removeChild(this.e.toolbar);
@@ -1265,7 +1292,8 @@
 
         /*
          |  ACTION :: PERFORM TOOLBAR ACTION
-         |  @version    0.3.0 [0.3.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         perform: function(type, args){
             var action = _action(type, args);
@@ -1289,7 +1317,8 @@
 
         /*
          |  ACTION :: INLINE ACTIONs
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         do_inline: function(markup, action, type){
             var sel = this.selection(),
@@ -1316,7 +1345,8 @@
 
         /*
          |  ACTION :: BLOCK ACTIONs
-         |  @version    0.3.0 [0.2.0]
+         |  @since  0.2.0
+         |  @update 0.3.0
          */
         do_block: function(markup, action, type){
             var sel = this.selection(),
