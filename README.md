@@ -1,8 +1,9 @@
 tail.writer
 ============
-> Version: 0.3.1 (Alpha)<br />
-> License: X11 / MIT<br />
-> Author: SamBrishes, pytesNET
+[![npm](https://img.shields.io/npm/v/tail.writer.svg?style=flat-square)](https://www.npmjs.com/package/tail.writer)
+[![npm](https://img.shields.io/npm/dt/tail.writer.svg?style=flat-square)](https://www.npmjs.com/package/tail.writer)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+[![Author](https://img.shields.io/badge/Author-SamBrishes@pytesNET-lightgrey.svg?style=flat-square)](https://www.github.com/pytesNET)
 
 A light-weight, powerful and Open Source GitHub Flavored Markdown editor, written in pure vanilla
 JavaScript with a jQuery and a MooTools implementation.
