@@ -1,13 +1,14 @@
 /*
  |  tail.writer - A small GitHub Flavored Markdown editor, written in vanillaJS!
  |  @author     SamBrishes@pytesNET
- |  @version    0.3.1 [0.3.0] - Alpha
+ |  @version    0.3.2 - Alpha
  |
  |  @license    X11 / MIT License
  |  @copyright  Copyright © 2015 - 2018 SamBrishes, pytesNET <pytes@gmx.net>
  */
-;(function(w, d){
+;(function(window){
     "use strict";
+    var w = window, d = window.document;
 
     /*
      |  HELPER METHODs
@@ -54,6 +55,18 @@
             e.initCustomEvent(event, ((options.bubbles)? true: false), ((options.cancelable)? true: false), options.detail);
             return element.dispatchEvent(e);
         },
+        clone: function(object, replace){
+            replace = (typeof(replace) == "object")? replace: {};
+            var clone = object.constructor();
+            for(var key in object){
+                if(replace.hasOwnProperty(key)){
+                    clone[key] = replace[key];
+                } else if(object.hasOwnProperty(key)){
+                    clone[key] = object[key];
+                }
+            }
+            return clone;
+        },
         animate: function(element, callback, delay, prevent){
             if(element.hasAttribute("data-tail-animation")){
                 if(!prevent){
@@ -73,13 +86,14 @@
             }, delay, element, callback, this);
         },
         animation: {},
-        animationCounter: 0,
+        animationCounter: 0
     };
+    tail.IE = (w.navigator.userAgent.indexOf("MSIE") > -1 || w.navigator.userAgent.indexOf("Edge") > -1);
 
     /*
      |  CONSTRUCTOR
      |  @since  0.2.0
-     |  @update 0.3.0
+     |  @update 0.3.2
      */
     var tailWriter = function(element, config){
         if(typeof(element) == "string"){
@@ -107,6 +121,10 @@
             return tailWriter.instances[element.getAttribute("data-writer")];
         }
 
+        // IE Fallback
+        config = (typeof(config) == "object")? config: {};
+        config.animate = (tail.IE)? false: (config.animate || tailWriter.defaults.animate);
+
         // Set Instance Data
         this.e = {
             "container": "",
@@ -115,7 +133,11 @@
             "statusbar": ""
         };
         this.id = ++tailWriter.counter;
-        this.con = Object.assign({}, tailWriter.defaults, (typeof(config) != "undefined")? config: {});
+        if(Object.assign){
+            this.con = Object.assign({}, tailWriter.defaults, config);
+        } else {
+            this.con = tail.clone(tailWriter.defaults, config);
+        }
 
         // Build and Return
         tailWriter.instances[this.id] = this.build();
@@ -146,7 +168,8 @@
         ],
         toolbarPosition: "top",
         tooltip: "top",
-        statusbar: true
+        statusbar: true,
+        animate: true
     };
 
     /*
@@ -472,22 +495,24 @@
                     }
                 }
 
-                if(MouseEvent && typeof(MouseEvent) !== "undefined"){
+                if(MouseEvent && MouseEvent.name){
                     var ev = new MouseEvent("mouseout");
                     this.current.dispatchEvent(ev);
                     setTimeout(function(element){
                         var ev = new MouseEvent("mouseover");
                         element.dispatchEvent(ev);
                     }, 200, this.current);
-                } else if(document.createEvent){ /* Fallback */
-                    var ev = document.createEvent("MouseEvent");
+                } else if(d.createEvent){ /* Fallback */
+                    var ev = d.createEvent("MouseEvent");
                         ev.initEvent("mouseout", true, false, {});
                     this.current.dispatchEvent(ev);
-                    setTimeout(function(element){
-                        var ev = document.createEvent("MouseEvent");
-                            ev.initEvent("mouseover", true, false, {});
-                        element.dispatchEvent(ev);
-                    }, 200, this.current);
+                    (function(element){
+                        setTimeout(function(){
+                            var ev = d.createEvent("MouseEvent");
+                                ev.initEvent("mouseover", true, false, {});
+                            element.dispatchEvent(ev);
+                        }, 200);
+                    })(this.current);
                 }
             }
         };
@@ -852,7 +877,7 @@
         /*
          |  HANDLE :: TOOLTIPs
          |  @since  0.2.0
-         |  @update 0.3.0
+         |  @update 0.3.2
          */
         tooltip: function(event, element){
             if(this.con.tooltip == false){
@@ -877,7 +902,7 @@
                     this.e.container.insertBefore(tooltip, this.e.container.children[0]);
 
                     // Calc Position
-                    var style = window.getComputedStyle(this.e.toolbar);
+                    var style = w.getComputedStyle(this.e.toolbar);
                     if(this.con.tooltip == "bottom"){
                         tooltip.style.top = (parseInt(style.top) + offset.height + tooltip.offsetHeight) + "px";
                     } else {
@@ -886,17 +911,21 @@
                     tooltip.style.left = (parseInt(style.left) + offset.left + (offset.width/2) - (tooltip.offsetWidth/2)) + "px";
 
                     // Animate
-                    tail.animate(tooltip, function(element){
-                        if(parseFloat(element.style.opacity) < 1.0){
-                            element.style.opacity = parseFloat(element.style.opacity) + 0.1;
-                            return true;
-                        }
-                        return false;
-                    }, 10, true);
+                    if(this.con.animate){
+                        tail.animate(tooltip, function(element){
+                            if(parseFloat(element.style.opacity) < 1.0){
+                                element.style.opacity = parseFloat(element.style.opacity) + 0.1;
+                                return true;
+                            }
+                            return false;
+                        }, 10, true);
+                    } else {
+                        tooltip.style.opacity = 1;
+                    }
                 }
             } else {
                 var element = this.e.container.querySelector("." + classes);
-                if(element){
+                if(element && this.con.animate){
                     tail.animate(element, function(element){
                         if(parseFloat(element.style.opacity) > 0.0){
                             element.style.opacity = parseFloat(element.style.opacity) - 0.1;
@@ -907,6 +936,10 @@
                         }
                         return false;
                     }, 10, true);
+                } else if(element){
+                    if(element.parentElement){
+                        element.parentElement.removeChild(element);
+                    }
                 }
             }
         },
@@ -914,7 +947,7 @@
         /*
          |  HANDLE :: RESIZE
          |  @since  0.2.0
-         |  @update 0.3.0
+         |  @update 0.3.2
          */
         resize: function(scroll){
             var clone   = this.e.editor.cloneNode(),
@@ -1112,7 +1145,7 @@
         /*
          |  CORE :: SHOW DROPDOWN
          |  @since  0.2.0
-         |  @update 0.3.0
+         |  @update 0.3.2
          */
         showDropdown: function(type, content, callback){
             var self = this;
@@ -1129,18 +1162,22 @@
             this.e.container.appendChild(dropdown);
 
             // Format Dropdown
-            var position = tail.position(this.current), style = window.getComputedStyle(this.e.toolbar);
+            var position = tail.position(this.current), style = w.getComputedStyle(this.e.toolbar);
             dropdown.style.top = position.top + position.height + "px";
             dropdown.style.left = position.left + parseInt(style.left) + "px";
             dropdown.tailWriter = callback;
 
-            tail.animate(dropdown, function(element){
-                if(parseFloat(element.style.opacity) < 1.0){
-                    element.style.opacity = parseFloat(element.style.opacity) + 0.1;
-                    return true;
-                }
-                return false;
-            }, 10, true);
+            if(this.con.animate){
+                tail.animate(dropdown, function(element){
+                    if(parseFloat(element.style.opacity) < 1.0){
+                        element.style.opacity = parseFloat(element.style.opacity) + 0.1;
+                        return true;
+                    }
+                    return false;
+                }, 10, true);
+            } else {
+                dropdown.style.opacity = 1;
+            }
 
             dropdown.querySelector("form").addEventListener("submit", function(event){
                 event.preventDefault();
@@ -1153,7 +1190,7 @@
         /*
          |  CORE :: HIDE DROPDOWN
          |  @since  0.2.0
-         |  @update 0.3.0
+         |  @update 0.3.2
          */
         hideDropdown: function(){
             var removed = new Array(),
@@ -1161,14 +1198,19 @@
             if(dropdowns.length > 0){
                 for(var i = 0; i < dropdowns.length; i++){
                     removed.push(dropdowns[i].getAttribute("data-writer-dropdown"));
-                    tail.animate(dropdowns[i], function(element){
-                        if(parseFloat(element.style.opacity) > 0.0){
-                            element.style.opacity = parseFloat(element.style.opacity) - 0.1;
-                            return true;
-                        }
-                        element.parentElement.removeChild(element);
-                        return false;
-                    }, 10, true);
+
+                    if(this.con.animate){
+                        tail.animate(dropdowns[i], function(element){
+                            if(parseFloat(element.style.opacity) > 0.0){
+                                element.style.opacity = parseFloat(element.style.opacity) - 0.1;
+                                return true;
+                            }
+                            element.parentElement.removeChild(element);
+                            return false;
+                        }, 10, true);
+                    } else {
+                        dropdowns[i].parentElement.removeChild(dropdowns[i]);
+                    }
                 }
             }
             return removed;
@@ -1177,7 +1219,7 @@
         /*
          |  CORE :: SHOW DIALOG
          |  @since  0.2.0
-         |  @update 0.3.0
+         |  @update 0.3.2
          */
         showDialog: function(type, content, callback){
             var self = this;
@@ -1199,13 +1241,17 @@
             });
             this.e.container.appendChild(mask);
 
-            tail.animate(mask, function(element){
-                if(parseFloat(element.style.opacity) < 1.0){
-                    element.style.opacity = parseFloat(element.style.opacity) + 0.1;
-                    return true;
-                }
-                return false;
-            }, 10, true);
+            if(this.con.animate){
+                tail.animate(mask, function(element){
+                    if(parseFloat(element.style.opacity) < 1.0){
+                        element.style.opacity = parseFloat(element.style.opacity) + 0.1;
+                        return true;
+                    }
+                    return false;
+                }, 10, true);
+            } else {
+                mask.style.opacity = 1;
+            }
 
             // Create Dialog
             var dialog = d.createElement("DIV");
@@ -1221,13 +1267,17 @@
             dialog.style.left = (this.e.container.offsetWidth / 2 - dialog.offsetWidth / 2) + "px";
             dialog.tailWriter = callback;
 
-            tail.animate(dialog, function(element){
-                if(parseFloat(element.style.opacity) < 1.0){
-                    element.style.opacity = parseFloat(element.style.opacity) + 0.1;
-                    return true;
-                }
-                return false;
-            }, 10, true);
+            if(this.con.animate){
+                tail.animate(dialog, function(element){
+                    if(parseFloat(element.style.opacity) < 1.0){
+                        element.style.opacity = parseFloat(element.style.opacity) + 0.1;
+                        return true;
+                    }
+                    return false;
+                }, 10, true);
+            } else {
+                dialog.style.opacity = 1;
+            }
 
             dialog.querySelector("form").addEventListener("submit", function(event){
                 event.preventDefault();
@@ -1240,7 +1290,7 @@
         /*
          |  CORE :: HIDE DIALOG
          |  @since  0.2.0
-         |  @update 0.3.0
+         |  @update 0.3.2
          */
         hideDialog: function(){
             var removed = new Array(),
@@ -1248,19 +1298,25 @@
             if(dialogs.length > 0){
                 for(var i = 0; i < dialogs.length; i++){
                     removed.push(dialogs[i].getAttribute("data-writer-dialog"));
-                    tail.animate(dialogs[i], function(element){
-                        if(parseFloat(element.style.opacity) > 0.0){
-                            element.style.opacity = parseFloat(element.style.opacity) - 0.1;
-                            return true;
-                        }
-                        element.parentElement.removeChild(element);
-                        return false;
-                    }, 10, true);
+
+                    if(this.con.animate){
+                        tail.animate(dialogs[i], function(element){
+                            if(parseFloat(element.style.opacity) > 0.0){
+                                element.style.opacity = parseFloat(element.style.opacity) - 0.1;
+                                return true;
+                            }
+                            element.parentElement.removeChild(element);
+                            return false;
+                        }, 10, true);
+                    } else {
+                        dialogs[i].parentElement.removeChild(dialogs[i]);
+                    }
                 }
             }
 
             // Mask
-            if(this.e.container.querySelector(".tail-writer-mask")){
+            var mask = this.e.container.querySelector(".tail-writer-mask");
+            if(mask && this.con.animate){
                 tail.animate(this.e.container.querySelector(".tail-writer-mask"), function(element){
                     if(parseFloat(element.style.opacity) > 0.0){
                         element.style.opacity = parseFloat(element.style.opacity) - 0.1;
@@ -1269,6 +1325,8 @@
                     element.parentElement.removeChild(element);
                     return false;
                 }, 10, true);
+            } else {
+                mask.parentElement.removeChild(mask);
             }
             return removed;
         },
@@ -1373,12 +1431,6 @@
         }
     }
 
-    // Assign to Window
-    if(typeof(w.tail) == "undefined"){
-        w.tail = {};
-    }
-    w.tail.writer = tailWriter;
-
     // Assign to jQuery
     if(typeof(jQuery) !== "undefined"){
         jQuery.fn.extend({
@@ -1391,11 +1443,18 @@
     }
 
     // Assign to MooTools
-    if(typeof(document.id) !== "undefined"){
+    if(typeof(d.id) !== "undefined"){
         Element.implement({
             tailWriter: function(options){
                 return new tailWriter(this, options);
             }
         });
     }
-})(window, document);
+
+    // Assign to Window
+    if(typeof(w.tail) == "undefined"){
+        w.tail = {};
+    }
+    w.tail.writer = tailWriter;
+    return w.tail.writer;
+})(this);
