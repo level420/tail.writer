@@ -1,6 +1,6 @@
 {
     "name": "tail.writer",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "A light-weight, powerful and configurable Open Source GitHub Flavored Markdown editor, written in pure vanilla JavaScript! ",
     "main": "js/tail.writer.js",
     "scripts": { },

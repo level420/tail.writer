@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 0.3.2 - Alpha
+---------------------
+-   Info: Official support for IE >= 9 starts now :(
+-   Add: New `clone()` helper function as Fallback for IE >= 9.
+-   Add: New `.IE` helper variable for Fallback use for IE >= 9.
+-   Add. New `animate` option, to disable it for IE (temporary solution).
+-   Bugfix: Almost complete IE >= 9 support, except the `animate` option.
+
 Version 0.3.1 - Alpha
 ---------------------
 -   Add: A German translation.

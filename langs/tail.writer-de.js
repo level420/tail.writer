@@ -1,5 +1,4 @@
 ;(function(w){
-
     w.tail.writer.strings = {
         bold: "Fett",
         italic: "Kursiv",
@@ -42,5 +41,4 @@
         w.tail.writer.strings.previewEmpty = "Keine Vorschau möglich!";
         w.tail.writer.strings.previewExit = "Vorschau Modus beenden";
     }
-
 })(window);
