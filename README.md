@@ -8,8 +8,7 @@ tail.writer
 A light-weight, powerful and Open Source GitHub Flavored Markdown editor, written in pure vanilla
 JavaScript with a jQuery and a MooTools implementation.
 
-[Demonstration](https://pytesNET.github.io/tail.writer/) |
-[Browser Unit Text](https://github.com/pytesNET/tail.writer/BROWSERTEST.md)
+[Demonstration](https://github.pytes.net/tail.writer)
 
 Work in Progress
 ----------------
