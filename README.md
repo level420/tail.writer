@@ -3,6 +3,7 @@ tail.writer
 [![npm](https://img.shields.io/npm/v/tail.writer.svg?style=flat-square)](https://www.npmjs.com/package/tail.writer)
 [![npm](https://img.shields.io/npm/dt/tail.writer.svg?style=flat-square)](https://www.npmjs.com/package/tail.writer)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+[![plainJS](https://img.shields.io/badge/plainJS-%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%9C%AB-yellow.svg?style=flat-square)](https://plainjs.com/javascript/plugins/tailwriter-186/)
 [![Author](https://img.shields.io/badge/Author-SamBrishes@pytesNET-lightgrey.svg?style=flat-square)](https://www.github.com/pytesNET)
 
 A light-weight, powerful and Open Source GitHub Flavored Markdown editor, written in pure vanilla
