@@ -272,6 +272,7 @@
 }
 .tail-writer-object input[type="text"], .tail-writer-object input[type="number"]{
     width: 150px;
+    height: auto;
     margin: 2px;
     padding: 3px 5px;
     display: inline-block;
@@ -351,6 +352,7 @@
     overflow: visible;    /* IE Fix */
     position: relative;
     text-align: center;
+    text-shadow: none;
     line-height: 30px;
     vertical-align: top;
     background-color: transparent;
@@ -361,6 +363,9 @@
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
 }
 .tail-writer-object button:hover, .tail-writer-object button.hover{
     color: #000000;
@@ -409,9 +414,16 @@
     border-width: 1px 0 1px 0;
     border-style: solid;
     border-color: #cccccc;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
 }
 .tail-writer-object .tail-writer-editor:hover,
 .tail-writer-object .tail-writer-editor:focus{
+    border-color: #cccccc;
     box-shadow: none;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
@@ -543,6 +555,7 @@
     padding: 0 10px;
     font-size: 11px;
     line-height: 26px;
+    background-image: none;
     border-color: #c0c0c0;
     box-shadow: 0 1px 1px #e0e0e0;
     -moz-box-shadow: 0 1px 1px #e0e0e0;

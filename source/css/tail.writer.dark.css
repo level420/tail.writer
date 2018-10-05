@@ -325,6 +325,11 @@
     border-top-color: #404448;
     border-bottom-color: #404448;
 }
+.tail-writer-object .tail-writer-editor:hover,
+.tail-writer-object .tail-writer-editor:focus{
+    border-top-color: #404448;
+    border-bottom-color: #404448;
+}
 .tail-writer-object .tail-writer-tooltip{
     color: #303438;
     margin: -17px 0 0 0;
