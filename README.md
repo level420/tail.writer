@@ -111,11 +111,9 @@ but I will keep a table of contents list here and some basic instructions.
 ### Files
 The **tail.writer** package contains many files and directories, which may confuse. The `less`
 folder can be ignored, unless you want to write a completely own design using the icon set or
-one of our designs as basic template.
-
-Basically the `css` and `js` folders (and the `markups` / `langs` directories maybe too) contains
-the main files, which you need to embed on your website. The content within the `css` folder should
-be self explanatory, the other the other folders contain these files:
+one of our designs as basic template. Basically the `css` and `js` folders (and the `markups` /
+`langs` directories maybe too) contains the main files, which you need to embed on your website.
+The content within the `css` folder should be self explanatory, the other ones contains these files:
 
 -   `js/tail.writer(.min).js` - Contains the main script, WITHOUT any markup language.
 -   `js/tail.writer-<markup>(.min).js` - Contains the main script, INCLUDING the named markup language.
