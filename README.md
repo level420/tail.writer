@@ -123,10 +123,9 @@ The content within the `css` folder should be self explanatory, the other ones c
 -   `markups/tail.markup-all.js` - Contains all available markup languages.
 -   `markups/tail.markup-<markup>.js` - Contains just the named markup language.
 
-So this mean, if you include just the `js/tail.writer(.min).js` file, nothing will happen, because
-you **NEED** to embed a single markup language too. Now you can include the markup syntax itself
-using one of the files within the `markups` folder OR you include a direct bundle from the `js`
-folder, so `js/tail.writer-markdown.min.js`, for example, which contains the Markdown markup.
+In other words: No main action / button will be available if you just embed the `js/tail.writer(.min).js`
+file. So either embed the desired markup language (within the `markups` directory) too or use a
+direct bundle (or the full package).
 
 ### Basic Instructions
 It's highly recommended to load the Stylesheet within your HTML Header, while you pass the
