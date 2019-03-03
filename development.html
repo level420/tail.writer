@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="content-language" content="en" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="robots" content="index, follow" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!</title>
+
+        <!-- Common -->
+        <meta name="author" content="SamBrishes, pytesNET" />
+        <meta name="publisher" content="SamBrishes, pytesNET" />
+        <meta name="copyright" content="SamBrishes, pytesNET" />
+        <meta name="name" content="tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!" />
+        <meta name="description" content="A tidy, powerful and extendable Markup ([GitHub Flavored] Markdown, BBCode, Textile) Editor, written in Vanilla JavaScript!" />
+        <meta name="keywords" content="Writer, Editor, JavaScript, JS, vanilla, pure, Note, Write, Text, Docs, Markdown, Markup, GFM, GitHub, Flavored, jQuery, MooTools, Script, Free, OpenSource." />
+        <meta itemprop="name" content="tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!" />
+        <meta itemprop="description" content="A tidy, powerful and extendable Markup ([GitHub Flavored] Markdown, BBCode, Textile) Editor, written in Vanilla JavaScript!" />
+        <meta itemprop="keywords" content="Writer, Editor, JavaScript, JS, vanilla, pure, Note, Write, Text, Docs, Markdown, Markup, GFM, GitHub, Flavored, jQuery, MooTools, Script, Free, OpenSource." />
+
+        <!-- Dublin Core -->
+        <meta name="DC.Language" content="en" />
+        <meta name="DC.Creator" content="SamBrishes, pytesNET" />
+        <meta name="DC.Publisher" content="SamBrishes, pytesNET" />
+        <meta name="DC.Rights" content="SamBrishes, pytesNET" />
+        <meta name="DC.Description" content="A tidy, powerful and extendable Markup ([GitHub Flavored] Markdown, BBCode, Textile) Editor, written in Vanilla JavaScript!" />
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="pytesNET" />
+        <meta name="twitter:creator" content="pytesNET" />
+        <meta name="twitter:title" content="tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!" />
+        <meta name="twitter:description" content="A tidy, powerful and extendable Markup ([GitHub Flavored] Markdown, BBCode, Textile) Editor, written in Vanilla JavaScript!" />
+
+        <!-- Open Graph -->
+        <meta name="og:type" content="website" />
+        <meta name="og:url" content="http://pytesNET.github.io/tail.writer" />
+        <meta name="og:locale" content="en" />
+        <meta name="og:title" content="tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!" />
+        <meta name="og:site_name" content="tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!" />
+        <meta name="og:description" content="A tidy, powerful and extendable Markup ([GitHub Flavored] Markdown, BBCode, Textile) Editor, written in Vanilla JavaScript!" />
+
+        <!-- Assets -->
+        <link type="text/css" rel="stylesheet" href="assets/css/octicons.css?ver=8.1.0" />
+        <link type="text/css" rel="stylesheet" href="assets/css/tail.stylesheet.min.css?ver=0.4.0" />
+        <script type="text/javascript" src="assets/js/prism.min.js"></script>
+        <script type="text/javascript" src="assets/js/menuspy.min.js"></script>
+        <script type="text/javascript" src="assets/js/tail.scripts.js"></script>
+        <script type="text/javascript" src="assets/js/tail.main.js"></script>
+
+        <!-- Source :: Styles -->
+        <link type="text/css" rel="stylesheet/less" href="source/less/tail.writer-github.less" id="writer-theme" />
+        <script type="text/javascript" src="assets/js/less.min.js"></script>
+
+        <!-- Source :: Dependencies -->
+        <script type="text/javascript" src="assets/js/marked.min.js"></script>
+        <script type="text/javascript" src="assets/js/textile.min.js"></script>
+        <script type="text/javascript" src="assets/js/bbsolid.min.js"></script>
+
+        <!-- Source :: Scripts -->
+        <script type="text/javascript" src="source/js/tail.writer.js"></script>
+        <script type="text/javascript" src="source/markups/tail.markup-markdown.js"></script>
+        <script type="text/javascript" src="source/markups/tail.markup-textile.js"></script>
+        <script type="text/javascript" src="source/markups/tail.markup-bbcode.js"></script>
+        <script type="text/javascript" src="source/langs/tail.writer-de.js"></script>
+    </head>
+    <body>
+        <div class="header">
+            <div class="container">
+                <div class="site-logo">
+                    <a href="https://github.pytes.net/tail.writer">
+                        tail.<b>writer</b>
+                    </a>
+                </div>
+
+                <div class="site-navigation">
+                    <ul class="site-navi">
+                        <li class="navi-item"><a href="https://github.pytes.net/tail.writer">Home</a></li>
+                        <li class="navi-item"><a href="https://www.github.com/tail.writer/wiki">Documentation</a></li>
+                        <li class="navi-item"><a href="https://github.com/pytesNET/tail.writer/zipball/master">Download</a></li>
+                    </ul>
+                </div>
+
+                <div class="site-meta">
+                    <ul class="site-navi">
+                        <li class="navi-item"><a href="https://www.pytes.net" target="_blank" class="pytesNET"><span class="octicon octicon-pytesnet-filled"></span></a></li>
+                        <li class="navi-item"><a href="https://www.github.com/pytesNET/tail.writer" target="_blank" class="github"><span class="octicon octicon-mark-github"></span></a></li>
+                        <li class="navi-item"><a href="https://www.twitter.com/pytesNET" target="_blank" class="twitter"><span class="octicon octicon-twitter"></span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="showcase">
+            <div class="container">
+                <div class="gear gear-1"><span class="octicon octicon-gear"></span></div>
+                <div class="gear gear-2"><span class="octicon octicon-gear"></span></div>
+                <div class="gear gear-3"><span class="octicon octicon-gear"></span></div>
+                <div class="gear gear-4"><span class="octicon octicon-gear"></span></div>
+
+                <div class="showcase-title"><span>tail.</span><span>writer</span></div>
+                <div class="showcase-description">
+                    <p class="main" align="center">Your new <i>_cool_</i> <b>**Markup**</b> Editor</p>
+                    <p align="center">With support for [ <acronym title="GitHub Flavored">GF</acronym> ] Markdown, Textile and BBCodes</p>
+                    <p align="center">and available for the Content Management System <a href="https://www.github.com/pytesNET/tail.writer-bludit" target="_blank">Bludit</a></p>
+                </div>
+                <div class="showcase-editor">
+                    <textarea id="showcase-example" placeholder="Type in some Text..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="content first">
+            <div class="container text-center">
+                <a href="https://github.com/pytesNET/tail.writer/zipball/master" class="special-button">Download Latest Release</a>
+            </div>
+        </div>
+
+        <div class="content white">
+            <div class="container">
+                <h1>A few awesome <b>Features</b></h1>
+
+                <div class="grid">
+                    <div class="cell-5">
+                        <dl class="features">
+                            <dt>Resizeable <code>textarea</code> editor</dt>
+                            <dd>
+                                <span class="icon"><span class="octicon octicon-unfold"></span></span>
+                                The height of the textarea field adapts itself to the amount of content, if desired. The toolbar has
+                                the same behaviour, it adds a scrollbar if to many actions are on a too small screen.
+                            </dd>
+
+                            <dt>Write-flow supporting functions</dt>
+                            <dd>
+                                <span class="icon"><span class="octicon octicon-pencil"></span></span>
+                                The browsers default behaviour remains unaffected as far as possible. We only repeat walkable /
+                                repeating markups add some usable shortcuts and give you the possibility to register your own ones.
+                            </dd>
+
+                            <dt>Word, Line & Character Counter</dt>
+                            <dd>
+                                <span class="icon"><span class="octicon octicon-dashboard"></span></span>
+                                The statusbar counts words, lines and each single character and can be completely controlled and
+                                overwritten by your own JavaScript function, if necessary.
+                            </dd>
+
+                            <dt>Full Markup Support</dt>
+                            <dd>
+                                <span class="icon"><span class="octicon octicon-markdown"></span></span>
+                                The complete GitHub Flavored Markdown, Textile and "default" BBCode repertoire is available to you
+                                and your users. Other Markup languages, such as Wikitext, are coming soon!
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="cell-5 cell-space-2">
+                        <dl class="features">
+                            <dt>Extendable and Rich API</dt>
+                            <dd>
+                                <span class="icon"><span class="octicon octicon-beaker"></span></span>
+                                The programming interface is really easy and smart and allows to write extensive and powerful plugins
+                                and extensions. Check out our awesome <a href="">Plugin Repository</a> on GitHub.
+                            </dd>
+
+                            <dt>Translatable Environment</dt>
+                            <dd>
+                                <span class="icon"><span class="octicon octicon-globe"></span></span>
+                                The complete environment, except the debug messages, are completely translatable in your websites-native
+                                language. It is also possible to switch the language on the fly!
+                            </dd>
+
+                            <dt>Support for jQuery, MooTools and IE 9+</dt>
+                            <dd>
+                                <span class="icon"><span class="octicon octicon-rocket"></span></span>
+                                This pure vanilla JavaScript plugins supports also the jQuery and MooTools JavaScript library as well as
+                                Microsoft's highly-modern, super-fast, powerful Internet Explorer 9 (and above).
+                            </dd>
+
+                            <dt>Free and Open Source</dt>
+                            <dd>
+                                <span class="icon"><span class="octicon octicon-squirrel"></span></span>
+                                Did we already mention, that this project is free and published under the MIT License? Just a few optional
+                                premium Plugins have to be purchased via one-time payment (currently not available!).
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="main-demo" class="content">
+            <div class="container">
+                <h1>Play with some <b>Settings</b></h1>
+
+                <div class="content-settings">
+                    <form action="demo">
+                        <div class="settings-tabs">
+                            <ul class="tabs-navi">
+                                <li class="navi-item active">
+                                    <button name="toolbar" value="default">Default</button>
+                                </li>
+                                <li class="navi-item">
+                                    <button name="toolbar" value="full">Full Featured</button>
+                                </li>
+                                <li class="navi-item">
+                                    <button name="toolbar" value="minimal">Minimal</button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="settings-form">
+                            <div class="settings-field">
+                                <select id="example-markup" name="markup">
+                                    <option value="markdown" selected>Markup: GF Markdown</option>
+                                    <option value="textile">Markup: Textile</option>
+                                    <option value="bbcode">Markup: BBCodes</option>
+                                </select>
+                                <label for="example-markup"><span class="octicon octicon-markdown"></span></label>
+                            </div>
+
+                            <div class="settings-field">
+                                <select id="example-design" name="theme">
+                                    <option value="white" selected>Design: White</option>
+                                    <option value="dark">Design: Dark</option>
+                                    <option value="github">Design: GitHub</option>
+                                </select>
+                                <label for="example-design"><span class="octicon octicon-paintcan"></span></label>
+                            </div>
+
+                            <div class="settings-field">
+                                <select id="example-language" name="locale">
+                                    <option value="en" selected>Language: English</option>
+                                    <option value="de">Sprache: Deutsch</option>
+                                </select>
+                                <label for="example-language"><span class="octicon octicon-book"></span></label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="content-editor">
+                    <textarea id="main-example" placeholder="Type in some Text...."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="content black">
+            <div class="container">
+                <h1>Extend tail.writer with this official <b>Plugins</b></h1>
+                <div class="grid">
+                    <div class="cell-4 cell-space-1">
+                        <div class="content-plugin">
+                            <div class="plugin-data">
+                                <div class="plugin-icon"><span class="octicon octicon-clippy"></span></div>
+                                <div class="plugin-text">
+                                    <span class="plugin-title">Storage</span>
+                                    <span class="plugin-description">
+                                        Stores the written text within the HTML5 Storage, to keep it on reloads.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-plugin">
+                            <div class="plugin-data">
+                                <div class="plugin-icon"><span class="octicon octicon-ellipsis"></span></div>
+                                <div class="plugin-text">
+                                    <span class="plugin-title">Quickbar</span>
+                                    <span class="plugin-description">
+                                        Shows a Quick Toolbar over special elements, such as tables and images.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cell-4 cell-space-2">
+                        <div class="content-plugin">
+                            <div class="plugin-data">
+                                <div class="plugin-icon"><span class="octicon octicon-list-ordered"></span></div>
+                                <div class="plugin-text">
+                                    <span class="plugin-title">Line Numbers</span>
+                                    <span class="plugin-description">
+                                        Shows the Line Numbers aside of the textarea editor field.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-plugin">
+                            <div class="plugin-data">
+                                <div class="plugin-icon"><span class="octicon octicon-settings"></span></div>
+                                <div class="plugin-text">
+                                    <span class="plugin-title">Advanced Form</span>
+                                    <span class="plugin-description">
+                                        Embed a Color Picker, a custom Table and Font Size / Family selector.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content white">
+            <div class="container">
+                <h1>Together we can improve tail.<b>writer</b></h1>
+                <div class="grid">
+                    <div class="cell-4 cell-space-1">
+                        <p>
+                            The tail.writer JavaScript plugin is still in <b>beta</b>, and may contains some bugs or
+                            unconventional patterns of behaviour. To fix all of these, and to make this script as
+                            <b>awesome</b> as possible, we need <b>your help</b>!
+                        </p>
+                        <p>
+                            So please report each bug, request each feature you wanna see and write us each
+                            improvement you would made on the official GitHub Repository page.
+                        </p>
+                        <p>
+                            Let's rock tail.writer!
+                        </p>
+                    </div>
+                    <div class="cell-4 cell-space-2">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="container">
+                <div class="pytesNET">
+                    <a href="https://www.pytes.net" target="_blank">
+                        <span class="dev dev-left">Developed By</span>
+                        <span class="octicon octicon-pytesnet"></span>
+                        <span class="dev dev-right">pytes<b>NET</b></span>
+                    </a>
+                </div>
+            </div>
+            <div class="container footer-copyright">
+                <div class="container-left">
+                    Copyright &copy; 2015 - 2019 pytesNET<br />
+                    Published under the MIT License
+                </div>
+                <div class="container-right text-right">
+                    Star, Fork and Download on <a href="https://www.github.com/pytesNET/tail.writer" class="github"><span class="octicon octicon-logo-github"></span></a>!<br />
+                    This Page uses <a href="https://prismjs.com/" target="_blank">prismJS</a> and <a href="https://github.com/lcdsantos/menuspy" target="_blank">MenuSpy</a>!
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

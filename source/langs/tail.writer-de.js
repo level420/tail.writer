@@ -1,44 +1,112 @@
-;(function(w){
-    w.tail.writer.strings = {
-        bold: "Fett",
-        italic: "Kursiv",
-        underline: "Unterstrichen",
-        strikethrough: "Durchgestrichen",
-        code: "Code",
-        link: "Hyperlink einfügen",
-        image: "Bild einfügen",
-        hr: "Durchgezogene Linie",
-        quote: "Zitat",
+/*
+ |  tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!
+ |  @file       ./langs/tail.writer-de.js
+ |  @author     SamBrishes <sam@pytes.net>
+ |  @version    0.4.0 - Beta
+ |
+ |  @website    https://github.com/pytesNET/tail.writer
+ |  @license    X11 / MIT License
+ |  @copyright  Copyright © 2015 - 2019 SamBrishes, pytesNET <info@pytes.net>
+ */
+;(function(factory){
+   if(typeof(define) == "function" && define.amd){
+       define(function(){
+           return function(writer){ factory(writer); };
+       });
+   } else {
+       if(typeof(window.tail) != "undefined" && window.tail.writer){
+           factory(window.tail.writer);
+       }
+   }
+}(function(writer){
+    "use strict";
+    var w = window, d = window.document, tail = writer.__helper;
+
+    w.tail.writer.strings.register("de", {
+        chars: "Zeichen",
+        lines: "Zeilen",
+        words: "Wörter",
+
+        // Markups
+        bbcode: "BBCode",
+        markdown: "Markdown",
+        textile: "Textile",
+
+        // Actions
+        about: "Über",
+        aboutDevelop: "Entwickelt von $1",
+        aboutDesc1: "geschrieben in purem Vanilla JavaScript",
+        aboutDesc2: "veröffentlicht unter der MIT Lizenz",
+        aboutDesign: "Designed mit $1",
+        aboutLink1: "GitHub Repository",
+        aboutLink2: "Dokumentation",
+        aboutLink3: "Demonstration",
+        aboutLink4: "Fehler melden",
+        fullscreen: "Vollbild wechseln",
         indent: "Einzug vergrößern",
+        markup: "Change Markup",
+        modeWrite: "Schreiben",
+        modePreview: "Vorschau",
         outdent: "Einzug verkleinern",
+        preview: "Vorschau wechseln",
+        previewEmpty: "Keine Vorschau möglich!",
+
+        // Debug
+        errorAction: "Die gewünschte Aktion ist unbekannt!",
+        errorMarkup: "Die gewünschte Markup ist unbekannt!",
+
+        // Markups
+        acronym: "Akronym",
+        big: "Großschrift",
+        bold: "Fett",
+        center: "Zentriert",
+        cite: "Zitieren",
+        code: "Quellcode (Inzeilig)",
+        codeblock: "Quellcode (Block)",
+        color: "Textfarbe",
+        definition: "Definitionsliste",
+        emphasize: "Emphasis",
+        email: "eMail",
+        emailAddress: "eMail Adresse",
+        emailButton: "eMail Link einfügen",
+        emailTitle: "eMail Titel",
+        font: "Schriftart",
         header: "Überschrift",
-        codeblock: "Quellcode",
-        listOrdered: "Geordnete Liste",
-        listUnordered: "Ungeordnete Liste",
-        listChecked: "Abgehackte Liste",
-        listUnchecked: "Unabgehackte Liste",
         headers: "Überschriften",
-        table: "Tabelle",
-        tableRows: "Zeilen",
-        tableCols: "Spalten",
-        tableHead: "Tabellenkopf einbetten",
-        tableCreate: "Tabelle erstellen",
-        linkDialog: "Hyperlink (Popup)",
-        imageDialog: "Bild (Popup)",
-        tableDialog: "Tabelle (Popup)",
-        linkTitle: "Link Titel",
-        linkURL: "Link URL",
-        linkCreate: "Link hinzufügen",
+        hr: "Vertikaler Trennstrich",
+        image: "Bild",
+        imageButton: "Bild einfügen",
         imageTitle: "Bild Titel",
         imageURL: "Bild URL",
-        imageCreate: "Bild hinzufügen",
-        lineCounter: "Zeilen",
-        charCounter: "Zeichen",
-        wordCounter: "Wörter"
-    };
-    if(typeof(marked) != "undefined"){
-        w.tail.writer.strings.preview = "Vorschau";
-        w.tail.writer.strings.previewEmpty = "Keine Vorschau möglich!";
-        w.tail.writer.strings.previewExit = "Vorschau Modus beenden";
-    }
-})(window);
+        italic: "Kursiv",
+        justify: "Blocksatz",
+        left: "Linksbündig",
+        link: "Hyperlink",
+        linkNewTab: "In einem neuen Tag öffnen",
+        linkButton: "Link einfügen",
+        linkTitle: "Link Titel",
+        linkURL: "Link URL",
+        listOrdered: "Geordnete Liste",
+        listUnordered: "Ungeordnete Liste",
+        listChecked: "Abgehakte Liste",
+        listUnchecked: "Unabgehakte Liste",
+        pre: "Vorformatierter Text",
+        quote: "Zitat",
+        right: "Rechtsbündig",
+        size: "Textgröße",
+        small: "Kleinschrift",
+        span: "Span",
+        strikethrough: "Durchgestrichen",
+        strong: "Fettdruck",
+        sub: "Tiefgestellt",
+        sup: "Hochgestellt",
+        table: "Tabelle",
+        tableButton: "Tabelle einfügen",
+        tableHeader: "Mit Tabellenkopf",
+        tableFooter: "Mit Tabellenfuß",
+        tableCols: "Spalten",
+        tableRows: "Zeilen",
+        underline: "Unterstrichen"
+    });
+    return writer;
+}));

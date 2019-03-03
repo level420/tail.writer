@@ -1,0 +1,106 @@
+//
+//  tail.writer.demo - The official demonstration page for our tail.writer script!
+//  @file       ./less/tail._mixins.less
+//  @author     SamBrishes <sam@pytes.net>
+//  @version    0.4.0 [0.4.0] - Alpha
+//
+//  @website    https://github.com/pytesNET/tail.writer
+//  @license    X11 / MIT License
+//  @copyright  Copyright © 2015 - 2019 SamBrishes, pytesNET <info@pytes.net>
+//
+
+//
+//  BASIC :: FONT FACE
+//
+.face(@name; @weight; @path; @local: ""; @style: normal;){
+    font-family: @name;
+    font-weight: @weight;
+    font-style: @style;
+    src: %(~'url("%s.eot")', @path);
+    src: @local
+         %(~'url("%s.eot#iefix")', @path) format("embedded-opentype"),
+         %(~'url("%s.woff2")', @path) format("woff2"),
+         %(~'url("%s.woff")', @path) format("woff"),
+         %(~'url("%s.ttf")', @path) format("truetype"),
+         %(~'url("%s.svg#%s")', @path, @name) format("svg");
+}
+
+//
+//  BASIC :: BORDER
+//
+.border(@width: 1px; @style: solid; @color: transparent;){
+    border-width: @width;
+    border-style: @style;
+    border-color: @color;
+}
+
+//
+//  BASIC :: RADIUS
+//
+.radius(@radius: 3px;){
+    border-radius: @radius;
+    -moz-border-radius: @radius;
+    -webkit-border-radius: @radius;
+}
+
+//
+//  BASIC :: SHADOW
+//
+.shadow(@shadow: none;){
+    box-shadow: @shadow;
+    -moz-box-shadow: @shadow;
+    -webkit-box-shadow: @shadow;
+}
+
+//
+//  BASIC :: TRANSITION
+//
+.transition(@transition: none;){
+    transition: @transition;
+    -moz-transition: @transition;
+    -webkit-transition: @transition;
+}
+
+//
+//  BASIC :: TRANSFORM
+//
+.transform(@transform: none;){
+    transform: @transform;
+    -o-transform: @transform;
+    -ms-transform: @transform;
+    -moz-transform: @transform;
+    -webkit-transform: @transform;
+}
+
+//
+//  BASIC :: ANIMATION
+//
+.animation(@animation: none;){
+    animation: @animation;
+    -o-animation: @animation;
+    -moz-animation: @animation;
+    -webkit-animation: @animation;
+}
+
+//
+//  BASIC :: ANIMATION
+//
+.animationDuration(@duration: none;){
+    animation-duration: @duration;
+    -o-animation-duration: @duration;
+    -moz-animation-duration: @duration;
+    -webkit-animation-duration: @duration;
+}
+
+//
+//  OCTICONS FONT
+//
+.octicon(@content: ""; @size: 14px; @height: 1;){
+    content: @content;
+    font: normal normal normal @size/@height "octicons";
+    text-transform: none;
+    speak: none;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

@@ -1,1460 +1,2190 @@
 /*
- |  tail.writer - A small GitHub Flavored Markdown editor, written in vanillaJS!
- |  @author     SamBrishes@pytesNET
- |  @version    0.3.2 - Alpha
+ |  tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!
+ |  @file       ./js/tail.writer.js
+ |  @author     SamBrishes <sam@pytes.net>
+ |  @version    0.4.0 - Beta
  |
+ |  @website    https://github.com/pytesNET/tail.writer
  |  @license    X11 / MIT License
- |  @copyright  Copyright © 2015 - 2018 SamBrishes, pytesNET <pytes@gmx.net>
+ |  @copyright  Copyright © 2015 - 2019 SamBrishes, pytesNET <info@pytes.net>
  */
-;(function(window){
-    "use strict";
-    var w = window, d = window.document;
+;(function(factory){
+    if(typeof(define) == "function" && define.amd){
+        define(function(){ return factory(window); });
+    } else {
+        if(typeof(window.tail) == "undefined"){
+            window.tail = {};
+        }
+        window.tail.writer = factory(window);
 
-    /*
-     |  HELPER METHODs
-     */
-    var tail = {
-        hasClass: function(element, classname){
-            var regex = new RegExp("(|\s+)" + classname + "(\s+|)");
-            return regex.test(element.className);
-        },
-        addClass: function(element, classname){
-            if(!this.hasClass(element, classname)){
-                element.className = (element.className.trim() + " " + classname.trim()).trim();
+        if(typeof(jQuery) != "undefined"){
+            jQuery.fn.tailwriter = function(o){
+                var r = [], i;
+                this.each(function(){ if((i = tail.writer(this, o)) !== false){ r.push(i); } });
+                return (r.length === 1)? r[0]: (r.length === 0)? false: r;
             }
-            return element;
-        },
-        removeClass: function(element, classname){
-            var regex = new RegExp("(|\s+)(" + classname + ")(\s+|)");
-            if(regex.test(element.className)){
-                element.className = (element.className.replace(regex, "$1$3")).trim();
-            }
-            return element;
-        },
-        position: function(element, absolute){
-            var position = {
-                top:    element.offsetTop    || 0,
-                left:   element.offsetLeft   || 0,
-                width:  element.offsetWidth  || 0,
-                height: element.offsetHeight || 0
-            };
-            if(absolute){
-                while(element = element.offsetParent){
-                    position.top  += element.offsetTop;
-                    position.left += element.offsetLeft;
-                }
-            }
-            return position;
-        },
-        trigger: function(element, event, options){
-            if(CustomEvent && typeof(CustomEvent) !== "undefined"){
-                var e = new CustomEvent(event, options);
-                return element.dispatchEvent(e);
-            }
-            var e = d.createEvent("CustomEvent");
-            e.initCustomEvent(event, ((options.bubbles)? true: false), ((options.cancelable)? true: false), options.detail);
-            return element.dispatchEvent(e);
-        },
-        clone: function(object, replace){
-            replace = (typeof(replace) == "object")? replace: {};
-            var clone = object.constructor();
-            for(var key in object){
-                if(replace.hasOwnProperty(key)){
-                    clone[key] = replace[key];
-                } else if(object.hasOwnProperty(key)){
-                    clone[key] = object[key];
-                }
-            }
-            return clone;
-        },
-        animate: function(element, callback, delay, prevent){
-            if(element.hasAttribute("data-tail-animation")){
-                if(!prevent){
-                    return;
-                }
-                clearInterval(tail.animation[element.getAttribute("data-tail-animation")]);
-            }
-            element.setAttribute("data-tail-animation", "tail-" + ++this.animationCounter);
-            this.animation["tail-" + this.animationCounter] = setInterval(function(e, func, tail){
-                var animationID = e.getAttribute("data-tail-animation");
-                if(func(e) == false){
-                    clearInterval(tail.animation[animationID]);
-                    if(e.parentElement){
-                        e.removeAttribute("data-tail-animation");
-                    }
-                }
-            }, delay, element, callback, this);
-        },
-        animation: {},
-        animationCounter: 0
+        }
+        if(typeof(MooTools) != "undefined"){
+            Element.implement({ tailwriter: function(o){ return new tail.writer(this, o); } });
+        }
+    }
+}(function(root){
+    "use strict";
+    var w = root, d = root.document, tail = {};
+
+    // Internal Helper Methods
+    var cHAS = tail.cHAS = function(e, name){
+        return (new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)")).test((e.className || ""));
     };
-    tail.IE = (w.navigator.userAgent.indexOf("MSIE") > -1 || w.navigator.userAgent.indexOf("Edge") > -1);
+    var cADD = tail.cADD = function(e, name){
+        if(!(new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)")).test(e.className || name)){
+            e.className += " " + name;
+        }
+        return e;
+    };
+    var cREM = tail.cREM = function(e, name, regex){
+        if((regex = new RegExp("(?:^|\\s+)(" + name + ")(?:\\s+|$)")) && regex.test(e.className || "")){
+            e.className = e.className.replace(regex, "");
+        }
+        return e;
+    };
+    var trigger = tail.trigger = function(el, event, opt){
+        if(CustomEvent && CustomEvent.name){
+            var ev = new CustomEvent(event, opt);
+        } else {
+            var ev = d.createEvent("CustomEvent");
+            ev.initCustomEvent(event, !!opt.bubbles, !!opt.cancelable, opt.detail);
+        }
+        return el.dispatchEvent(ev);
+    };
+    var clone = tail.clone = function(target, source){
+        source = (typeof(source) == "object")? source: {};
+        if(Object.assign){
+            return Object.assign({}, target, source);
+        }
+        var clone = new Object();
+        for(var key in target){ clone[key] = target[key]; }
+        for(var key in source){ clone[key] = source[key]; }
+        return clone;
+    };
+    var position = tail.position = function(e, abs){
+        var position = {
+            top:    e.offsetTop    || 0,
+            left:   e.offsetLeft   || 0,
+            width:  e.offsetWidth  || 0,
+            height: e.offsetHeight || 0
+        };
+        if(abs){
+            while(e = e.offsetParent){
+                position.top  += e.offsetTop;
+                position.left += e.offsetLeft;
+            }
+        }
+        return position;
+    };
+    var create = tail.create = function(tag, classes){
+        var r = d.createElement(tag);
+            r.className = (classes && classes.join)? classes.join(" "): classes || "";
+        return r;
+    };
 
     /*
      |  CONSTRUCTOR
-     |  @since  0.2.0
-     |  @update 0.3.2
+     |  @version    0.4.0 [0.2.0]
      */
-    var tailWriter = function(element, config){
-        if(typeof(element) == "string"){
-            element = d.querySelectorAll(element);
-        }
-        if(element instanceof NodeList || element instanceof HTMLCollection){
-            if(element.length == 0){
-                return false;
+    var writer = function(el, config){
+        el = (typeof(el) == "string")? d.querySelectorAll(el): el;
+        if(el instanceof NodeList || el instanceof HTMLCollection || el instanceof Array){
+            for(var _r = [], l = el.length, i = 0; i < l; i++){
+                _r.push(new writer(el[i], clone(config, {})));
             }
-            var _return = new Array();
-            for(var i = 0; i < element.length; i++){
-                _return.push(new tailWriter(element[i], config));
-            }
-            return _return;
+            return (_r.length === 1)? _r[0]: ((_r.length === 0)? false: _r);
         }
-        if(typeof(this) == "undefined"){
-            return new tailWriter(element, config);
+        if((el.tagName || "") != "TEXTAREA"){
+            return false;
+        }
+        if(!(this instanceof writer)){
+            return new writer(el, config);
         }
 
         // Check Element
-        if(!(element instanceof Element)){
-            return false;
+        if(writer.inst[el.getAttribute("data-tail-writer")]){
+            return writer.inst[el.getAttribute("data-tail-writer")];
         }
-        if(element.hasAttribute("data-writer") && tailWriter.instances[element.getAttribute(element, "data-writer")]){
-            return tailWriter.instances[element.getAttribute("data-writer")];
+        if(el.getAttribute("data-writer")){
+            var test = JSON.parse(el.getAttribute("data-writer").replace(/\'/g, '"'));
+            if(test instanceof Object){
+                config = clone(config, test); // This is an unofficial function ;3
+            }
         }
 
-        // IE Fallback
+        // Get Element Options
         config = (typeof(config) == "object")? config: {};
-        config.animate = (tail.IE)? false: (config.animate || tailWriter.defaults.animate);
+        config.width = (config.width === true)? el.offsetWidth: config.width;
+        config.disabled = ("disabled" in config)? config.disabled: el.disabled;
+        config.readonly = ("readonly" in config)? config.readonly: el.readOnly;
+        config.classNames = ("classes" in config)? config.classes: config.classNames || null;
 
-        // Set Instance Data
+        // Init Instance
         this.e = {
-            "container": "",
-            "editor": element,
-            "toolbar": "",
-            "statusbar": ""
+            main: null,
+            editor: el,
+            tools: null,
+            status: null
         };
-        this.id = ++tailWriter.counter;
-        if(Object.assign){
-            this.con = Object.assign({}, tailWriter.defaults, config);
-        } else {
-            this.con = tail.clone(tailWriter.defaults, config);
-        }
-
-        // Build and Return
-        tailWriter.instances[this.id] = this.build();
-        return this;
-    }
-    tailWriter.status = "alpha";
-    tailWriter.version = "0.3.1";
-
-    // Instances
-    tailWriter.counter = 0;
-    tailWriter.instances = {};
-    tailWriter.placeholder = ("placeholder" in d.createElement("input"));
+        this.id = ++writer.count;
+        this.con = clone(writer.defaults, config);
+        this.keys = {};
+        this.events = {};
+        writer.inst["tail-" + this.id] = this;
+        return this.init();
+    };
+    writer.__helper = tail;
+    writer.version = "0.4.0";
+    writer.status = "beta";
+    writer.count = 0;
+    writer.inst = {};
 
     /*
      |  STORE :: DEFAULT OPTIONS
      */
-    tailWriter.defaults = {
-        width: "100%",
-        height: ["200px", "500px"],
-        classes: "",
-        resize: true,
+    writer.defaults = {
+        classNames: null,
+        debug: true,
+        disabled: false,
+        doubleLineBreak: false,
+        fullscreenParent: d.body,
+        height: [200, 500],
         indentTab: false,
         indentSize: 4,
-        toolbar: [
-            "headers", "|", "bold", "italic", "strikethrough", "|", "quote", "code",
-            "codeblock", "indent", "outdent", "|", "link", "image", "table", "hr", "|",
-            "list:unordered", "list:ordered", "|", "preview"
-        ],
-        toolbarPosition: "top",
-        tooltip: "top",
+        locale: "en",
+        markup: null,
+        previewConverter: null,
+        preventBindings: false,
+        readonly: false,
+        resize: true,
         statusbar: true,
-        animate: true
+        toolbar: "default",
+        toolbarMultiLine: false,
+        toolbarScrollable: true,
+        tooltip: "top",
+        width: "100%"
     };
 
     /*
-     |  STORE :: ACTIONs
+     |  STORAGE :: MARKUPS
      */
-    tailWriter.actions = {
-        bold: {
-            syntax: "**$1**",
-            callback: "inline"
-        },
-        italic: {
-            syntax: "_$1_",
-            callback: "inline"
-        },
-        underline: {
-            syntax: "<u>$1</u>",
-            callback: "inline"
-        },
-        strikethrough: {
-            syntax: "~~$1~~",
-            callback: "inline"
-        },
-        code: {
-            syntax: "`$1`",
-            callback: "inline"
-        },
-        hr: {
-            syntax: "----------",
-            callback: "block",
-            filter: function(before, content, after){
-                if(before.length != before.lastIndexOf("\n")+1){
-                    content = "\n" + content;
-                }
-                if(after.indexOf("\n") < 0 && content.indexOf("\n") <= 0){
-                    content = content + "\n";
-                }
-                return content;
-            }
-        },
-        codeblock: {
-            syntax: "```\n$1\n```",
-            callback: "inline",
-            filter: function(before, content, after, selection){
-                if(content == this.syntax.replace("$1", "")){
-                    return content;
-                }
-                content = content.replace(/```\n\n```/g, "");
-                selection.start += this.syntax.indexOf("$1");
-                selection.end    = content.length - this.syntax.indexOf("$1");
-                return content;
-            }
-        },
-        quote: {
-            syntax: ">\t$1",
-            callback: "block",
-            walker: true
-        },
+    var markups = writer.markups = function(self, markup){
+        if(typeof(this) == undefined){
+            return new markups(self);
+        }
+
+        // Create Instance
+        if(markup in markups.markups){
+            this.actions = markups.markups[markup].actions;
+            this.walkers = markups.markups[markup].walkers;
+            this.toolbars = markups.markups[markup].toolbars;
+            this.renderer = markups.markups[markup].renderer;
+        } else {
+            this.actions = {};
+            this.walkers = {};
+            this.toolbars = {};
+            this.renderer = function(_){ return _; };
+        }
+        this.self = self;
+        this.markup = markup;
+        this.toolbar = [];
+        this.walkers["indent"] = "\t";
+        return this;
+    };
+    writer.markups.markups = {};
+    writer.markups.globals = {
+
+        // Special :: Indent
         indent: {
             syntax: "\t$1",
-            callback: function(markup, action, type){
-                var sel = this.selection(), self = this,
-                    __1 = this.val.slice(0, sel.start),
-                    __2 = this.val.slice(sel.start, sel.end),
-                    __3 = this.val.slice(sel.end);
+            action: function(markup, action, type){
+                var sel = this.selection(), count = 1;
+                if(this.walker !== false && this.previousLine() !== false){
+                    count = this.indentation("count", this.previousLine());
+                }
+                count = "\t".repeat(count);
 
-                this.indent = this.indenter(this.lines.current, "count") + 1;
-                if(__2.indexOf("\n") == -1){
-                    return this.writeLine(this.indenter("\t", "create"), "before");
-                }
-                __2 = __2.replace(/[^|\n].*/g, function(str){
-                    return self.indenter("\t", "create") + str;
-                });
-                sel.end = __1.length + __2.length;
-                return this.write(__1 + __2 + __3, sel);
-            }
-        },
-        outdent: {
-            syntax: false,
-            callback: function(markup, action, type){
-                var sel = this.selection(),
-                    __1 = this.val.slice(0, sel.start),
-                    __2 = this.val.slice(sel.start, sel.end),
-                    __3 = this.val.slice(sel.end, this.val.length),
-                    ind = this.indenter("\t"),
-                    rep = new RegExp("\n" + ind, "g");
+                if(sel.start === sel.end){
+                    this.setContent(this.indentation("convert", count, true), "prepend", sel.start, null);
+                } else {
+                    var area = {start: 0, end: 0}, select = {start: 0, end: 0};
 
-                // Remove Indent
-                if(/\n/.test(__2)){
-                    __2 = __2.replace(rep, "\n", __2);
-                } else if(this.lines.current.indexOf(ind) == 0){
-                    var __4 = __1.slice(0, __1.lastIndexOf("\n")+1),
-                        __5 = __1.slice(__1.lastIndexOf("\n")+1+ind.length, __1.length);
-                    __1 = __4 + __5;
-                }
-                if(__2.indexOf(ind) == 0){
-                    __2 = __2.slice(ind.length);
-                }
+                    // Get Section
+                    var section = this.splitContent(sel);
+                        section[0] = section[0].split("\n");
+                        section[2] = section[2].split("\n");
+                    var content = section[0].pop() + section[1] + section[2].shift();
 
-                sel.start = __1.length;
-                sel.end   = __1.length + __2.length;
-                return this.write(__1 + __2 + __3, sel);
-            }
-        },
-        header: {
-            syntax: function(num){
-                num = (num >= 1 && num <= 6)? parseInt(num): 1;
-                if(num == 1){ return "$1\n=========="; }
-                if(num == 2){ return "$1\n----------"; }
-                return (new Array(num + 1).join("#")) + " $1";
-            },
-            callback: "block",
-            filter: function(before, content, after, selection){
-                if(content == "\n==========" || content == "\n----------"){
-                    selection.start = selection.end = before.length;
+                    // Set Area
+                    area.start = select.start  = (section[0].join("\n").length);
+                    area.start = select.start += (section[0].length > 0)? 1: 0;
+                    area.end   = area.start + content.length;
+
+                    // Modify Content
+                    content = this.indentation("indent", content);
+                    select.end = select.start + content.length;
+                    this.setContent(content, "replace", area, null);
                 }
-                return content;
-            }
-        },
-        list: {
-            title: function(type){
-                var type = (typeof(type) == "undefined")? "unordered": type;
-                return "list" + type[0].toUpperCase() + type.slice(1);
+                return true;
             },
-            syntax: function(type){
-                switch(type){
-                    case "checked":
-                        return "- [x]\t$1";
-                    case "unchecked":
-                        return "- [ ]\t$1";
-                    case "ordered":
-                        return "1.\t$1";
-                }
-                return "-\t$1";
-            },
-            filter: function(before, content, after){
-                if(content.indexOf("1.") !== 0){
-                    return content;
-                }
-                var number = before.match(/^([0-9]+)\.\s+/gm);
-                if(number){ return content.replace("1", (number.length+1).toString()); }
-                return content;
-            },
-            callback: "block",
             walker: true
         },
-        headers: {
-            syntax: self.header,
-            callback: function(markup, action, type, args){
-                var content = '<form>';
-                for(var i = 1; i <= ((args.length > 0 && args[0] == "x3")? 3: 6); i++){
-                    content += '<div class="tail-writer-item tail-writer-item-header-' + i + '">' +
-                        '   <button onclick="this.parentElement.parentElement.querySelector(\'input\').value = ' + i + ';">' +
-                        '       <span class="icon-header-' + i + '" ></span> Header ' + i +
-                        '   </button>' +
-                        '</div>';
-                }
-                content += '<input type="hidden" name="header" value="" /></form>';
-                this.showDropdown(type + ((args.length > 0)? "-" + args.join("-"): ""), content, function(form, event){
-                    var num = parseInt(form.header.value);
-                    this.perform("header", [((num < 1 || num > 6 || isNaN(num))? 1: num)]);
-                    return true;
-                });
-            }
-        },
-        link: {
-            syntax: "[$1](url)",
-            callback: function(markup, action, type, args){
-                if(args.length == 0){
-                    return this.do_inline(markup, action, type);
-                }
-                var content = '' +
-                    '<form>' +
-                    '   <div class="tail-writer-row">' +
-                    '       <span class="tail-writer-label tail-writer-label-title">' + __(type + "Title") + '</span>' +
-                    '       <input type="text" name="title" value="" class="field-text" placeholder="' + __(type + "Title") + '" />' +
-                    '   </div>' +
-                    '   <div class="tail-writer-row">' +
-                    '       <span class="tail-writer-label tail-writer-label-url">' + __(type + "URL") + '</span>' +
-                    '       <input type="text" name="url" value="" class="field-text" placeholder="' + __(type + "URL") + '" />' +
-                    '   </div>' +
-                    '   <div>' +
-                    '       <button name="type" value="' + type + '">' +  __(type + "Create") + '</button>' +
-                    '   </div>' +
-                    '</form>', self = this,
-                    handle = function(form){
-                        var markup = tailWriter.actions[form.type.value].syntax + " ";
-                            markup = markup.replace("url", form.url.value).replace("$1", form.title.value);
-                        self.do_inline(markup, self, type);
-                        return true;
-                    };
-                if(args[0] == "dropdown"){
-                    this.showDropdown(type + "-dropdown", content, handle);
-                } else {
-                    this.showDialog(type + "-dialog", content, handle);
-                }
-            },
-            filter: function(before, content, after, selection){
-                if(content == "[](url)"){
-                    selection.end += "link-title".length;
-                    return "[link-title](url)";
-                }
-                return content;
-            }
-        },
-        image: {
-            syntax: "![$1](url)",
-            callback: function(markup, action, type, args){
-                tailWriter.actions.link.callback.call(this, markup, action, type, args);
-            },
-            filter: function(before, content, after, selection){
-                if(content == "![](url)"){
-                    selection.end += "image-title".length;
-                    return "![image-title](url)";
-                }
-                return content;
-            }
-        },
-        table: {
+
+        // Special :: Outdent
+        outdent: {
             syntax: false,
-            callback: function(markup, action, type, args){
-                var content = '' +
-                    '<form>' +
-                    '   <div class="tail-writer-row">' +
-                    '       <span class="tail-writer-label tail-writer-label-rows">' + __("tableRows") + '</span>' +
-                    '       <input type="number" name="rows" value="3" class="field-number" placeholder="' + __("tableRows") + '" />' +
-                    '   </div>' +
-                    '   <div class="tail-writer-row">' +
-                    '       <span class="tail-writer-label tail-writer-label-cols">' + __("tableCols") + '</span>' +
-                    '       <input type="number" name="cols" value="3" class="field-number" placeholder="' + __("tableCols") + '" />' +
-                    '   </div>' +
-                    '   <div class="tail-writer-row">' +
-                    '       <input type="checkbox" id="tail-writer-table-head-' + this.id + '" name="head" value="1" class="field-header" />' +
-                    '       <label for="tail-writer-table-head-' + this.id + '">' + __("tableHead") + '</label>' +
-                    '   </div>' +
-                    '   <div>' +
-                    '       <button>' +  __("tableCreate") + '</button>' +
-                    '   </div>' +
-                    '</form>', self = this,
-                    handle = function(form){
-                        var head = form.head.checked,
-                            rows = parseInt(form.rows.value), cols = parseInt(form.cols.value);
-                            rows = isNaN(rows)? 3: rows;      cols = isNaN(cols)? 3: cols;
+            action: function(markup, action, type){
+                var sel = this.selection();
 
-                        var content = '', spaces = 12;
-                        for(var i = 0; i <= rows; i++){
-                            if(!head && i == 0){
-                                continue; // Skip Table Header
-                            }
+                if(sel.start === sel.end){
+                    var regex = new RegExp("(\\t|" + (new Array(this.con.indentSize + 1)).join(" ") + ")$");
 
-                            for(var i2 = 1; i2 <= cols; i2++){
-                                content += "| ";
-                                for(var s = 0; s < spaces; s++){
-                                    content += " ";
-                                }
-                                content += " ";
-                            }
-                            content += "|\n";
-
-                            if(i == 0){
-                                for(var i2 = 1; i2 <= cols; i2++){
-                                    content += "| ";
-                                    for(var s = 0; s < spaces; s++){
-                                        content += "-";
-                                    }
-                                    content += " ";
-                                }
-                                content += "|\n";
-                            }
-                        }
-                        this.do_block(content, self, "table");
-                        return true;
-                    };
-                if(args[0] == "dropdown"){
-                    this.showDropdown(type + "-dropdown", content, handle);
+                    // Line Handling
+                    var line = this.splitContent(sel);
+                        line[0] = line[0].split("\n");
+                        line[2] = line[2].split("\n");
+                    var curr = line[0].pop() + line[1] + line[2].shift(),
+                        char = sel.start - (line[0].join("\n").length + (line[0].length? 1: 0)),
+                        next = curr.substr(char),
+                        prev = curr.substr(0, char);
+                    this.currentLine(prev.replace(regex, "") + next);
                 } else {
-                    this.showDialog(type + "-dialog", content, handle);
+                    var area = {start: 0, end: 0}, select = {start: 0, end: 0};
+
+                    // Get Section
+                    var section = this.splitContent(sel);
+                        section[0] = section[0].split("\n");
+                        section[2] = section[2].split("\n");
+                    var content = section[0].pop() + section[1] + section[2].shift();
+
+                    // Set Area
+                    area.start = select.start  = (section[0].join("\n").length);
+                    area.start = select.start += (section[0].length > 0)? 1: 0;
+                    area.end   = area.start + content.length;
+
+                    // Modify Content
+                    content = this.indentation("outdent", content);
+                    select.end = select.start + content.length;
+                    this.setContent(content, "replace", area, null);
                 }
+                return true;
             }
-        }
-    };
-    if(typeof(marked) != "undefined"){
-        tailWriter.actions.preview = {
+        },
+
+        // Special :: Preview
+        preview: {
             syntax: false,
-            callback: function(markup, action, type){
-                if(!tail.hasClass(this.current, "active")){
-                    var content = this.e.editor.value;
-                    if(content.length == 0){
-                        content = __("previewEmpty");
-                    }
+            toolbar: function(tool){
+                // CSS Translations (No idea how else to do it)
+                tool.setAttribute("data-write", this.translate("modeWrite"));
+                tool.setAttribute("data-preview", this.translate("modePreview"));
+                return tool;
+            },
+            action: function(markup, action, type){
+                var action = this.e.tools.querySelector(".action-preview");
 
-                    // Render Content and Preview
-                    var preview = d.createElement("DIV");
-                        preview.innerHTML = tailWriter.parse(content);
-                        preview.className = "tail-writer-preview";
-                        preview.style.width = this.e.editor.outerWidth;
-                        preview.style.height = this.e.editor.outerHeight;
+                // Get Converter
+                var convert = this.con.previewConverter, content, preview, tools;
+                if(typeof(convert) !== "function"){
+                    convert = this.markup.renderer || function(_1){ return _1; };
+                }
+                this.hideElement("dialog");
+                this.hideElement("dropdown");
 
-                    // Manipulate Elements
-                    tail.removeClass(this.current, "icon-preview");
-                    tail.addClass(this.current, "active icon-editor");
-                    tail.addClass(this.e.container, "tail-writer-preview");
-                    this.current.setAttribute("data-writer-title", __("previewExit"));
+                // Handle
+                if(!tail.cHAS(this.e.main, "preview")){
+                    content = this.e.editor.value;
+                    content = (content.length)? content: this.translate("previewEmpty");
 
+                    // Render
+                    preview = tail.create("DIV", "tail-writer-preview");
+                    preview.innerHTML = convert.call(this, content, this.con.markup);
+                    preview.style.width = this.e.editor.outerWidth + "px";
+                    preview.style.height = this.e.editor.style.height;
+                    preview.style.minHeight = this.e.editor.style.minHeight;
+                    preview.style.maxHeight = this.e.editor.style.maxHeight;
+
+                    // Inject
+                    action.setAttribute("data-writer-title", this.translate("previewExit"));
                     this.e.editor.style.display = "none";
-                    this.e.container.insertBefore(preview, this.e.editor);
+                    this.e.main.insertBefore(preview, this.e.editor);
+                    cADD(this.e.main, "preview");
 
-                    var tools = this.e.toolbar.querySelectorAll("button:not(.icon-editor)");
-                    for(var i = 0; i < tools.length; i++){
-                        tail.addClass(tools[i], "disabled");
+                    // Disable Buttons
+                    tools = this.e.tools.querySelectorAll("button:not(.action-preview)");
+                    for(var l = tools.length, i = 0; i < l; i++){
+                        cADD(tools[i], "disabled");
                     }
+                    cADD(this.e.tools.querySelector(".action-preview"), "active");
                 } else {
-                    tail.removeClass(this.current, "active icon-editor");
-                    tail.removeClass(this.e.container, "tail-writer-preview");
-                    tail.addClass(this.current, "icon-preview");
-                    this.current.setAttribute("data-writer-title", __("preview"));
-
-                    this.e.container.removeChild(this.e.container.querySelector(".tail-writer-preview"));
+                    cREM(this.e.main, "preview");
+                    action.setAttribute("data-writer-title", this.translate("preview"));
+                    this.e.main.removeChild(this.e.main.querySelector(".tail-writer-preview"));
                     this.e.editor.style.display = "block";
 
-                    var tools = this.e.toolbar.querySelectorAll("button.disabled");
+                    // Enable Buttons
+                    tools = this.e.tools.querySelectorAll("button.disabled");
                     for(var i = 0; i < tools.length; i++){
-                        tail.removeClass(tools[i], "disabled");
+                        cREM(tools[i], "disabled");
                     }
-                }
-
-                if(MouseEvent && MouseEvent.name){
-                    var ev = new MouseEvent("mouseout");
-                    this.current.dispatchEvent(ev);
-                    setTimeout(function(element){
-                        var ev = new MouseEvent("mouseover");
-                        element.dispatchEvent(ev);
-                    }, 200, this.current);
-                } else if(d.createEvent){ /* Fallback */
-                    var ev = d.createEvent("MouseEvent");
-                        ev.initEvent("mouseout", true, false, {});
-                    this.current.dispatchEvent(ev);
-                    (function(element){
-                        setTimeout(function(){
-                            var ev = d.createEvent("MouseEvent");
-                                ev.initEvent("mouseover", true, false, {});
-                            element.dispatchEvent(ev);
-                        }, 200);
-                    })(this.current);
+                    cREM(this.e.tools.querySelector(".action-preview"), "active");
                 }
             }
-        };
-    }
-    var _action = function(type, args){
-        if(typeof(type) == "string" && tailWriter.actions.hasOwnProperty(type)){
-            var action = tailWriter.actions[type];
-        } else {
-            return false;
-        }
+        },
 
-        // Handle Syntax
-        if(typeof(action.syntax) == "function"){
-            action.markup = action.syntax.apply(action, args);
-        } else {
-            action.markup = action.syntax;
-        }
+        // Special :: Fullscreen
+        fullscreen: {
+            syntax: false,
+            action: function(markup, action, type){
+                if(this.con.fullscreenParent === null){
+                    this.con.fullscreenParent = d.body;
+                }
 
-        // Handle Title
-        action.id = type + ((args.length > 0)? "-" + args.join("-"): "");
-        if(typeof(action.title) == "function"){
-            action.string = __(action.title.apply(action, args));
-        } else {
-            action.string = __(type);
-        }
-        return action;
-    };
-    var _filter = function(action, before, content, after, selection){
-        if(typeof(action.filter) == "function"){
-            return action.filter.call(action, before, content, after, selection);
-        }
-        return content;
-    };
+                if(!cHAS(this.e.main, "fullscreen")){
+                    cADD(this.e.main, "fullscreen");
+                    d.body.style.cssText = "overflow:hidden;";
 
-    /*
-     |  STORE :: STRINGS
-     */
-    tailWriter.strings = {
-        bold: "Bold",
-        italic: "Italic",
-        underline: "Underline",
-        strikethrough: "Strikethrough",
-        code: "Inline Code",
-        link: "Link",
-        image: "Image",
-        hr: "Horizontal Rule",
-        quote: "Blockquote",
-        indent: "Indent",
-        outdent: "Outdent",
-        header: "Header",
-        codeblock: "Code Block",
-        listOrdered: "Ordered List",
-        listUnordered: "Unordered List",
-        listChecked: "Checked List",
-        listUnchecked: "Unchecked List",
-        headers: "Headers",
-        table: "Table",
-        tableRows: "Rows",
-        tableCols: "Columns",
-        tableHead: "Include Header",
-        tableCreate: "Create Table",
-        linkDialog: "Link (Dialog)",
-        imageDialog: "Image (Dialog)",
-        tableDialog: "Table (Dialog)",
-        linkTitle: "Link Title",
-        linkURL: "Link URL",
-        linkCreate: "Add Link",
-        imageTitle: "Image Title",
-        imageURL: "Image URL",
-        imageCreate: "Add Image",
-        lineCounter: "Lines",
-        charCounter: "Characters",
-        wordCounter: "Words"
-    };
-    if(typeof(marked) != "undefined"){
-        tailWriter.strings.preview = "Preview";
-        tailWriter.strings.previewEmpty = "Nothing to preview yet!";
-        tailWriter.strings.previewExit = "Exit Preview Mode";
-    }
-    var __ = function(key){
-        if(tailWriter.strings.hasOwnProperty(key)){
-            return tailWriter.strings[key];
-        }
-        return key;
-    };
+                    this.placeholder = create("DIV");
+                    this.placeholder.id = this.e.main.id + "-placeholder";
 
-    /*
-     |  API :: MARKDOWN PARSER
-     |  @since  0.3.0
-     |  @update 0.3.0
-     */
-    tailWriter.parse = function(content){
-        if(typeof(marked) == "undefined"){
-            return content;
-        }
+                    this.e.main.parentElement.replaceChild(this.placeholder, this.e.main);
+                    this.con.fullscreenParent.appendChild(this.e.main);
+                } else {
+                    cREM(this.e.main, "fullscreen");
+                    d.body.style.removeProperty("overflow");
 
-        // Checklist Support (https://github.com/chjj/marked/issues/107#issuecomment-44542001)
-        var render = new marked.Renderer();
-        render.listitem = function(text){
-            if(/^\s*\[[x ]\]\s*/.test(text)){
-                text = text
-                    .replace(/^\s*\[ \]\s*/, '<input type="checkbox"> ')
-                    .replace(/^\s*\[x\]\s*/, '<input type="checkbox" checked> ');
-                return '<li style="list-style: none">' + text + '</li>';
+                    this.placeholder.parentElement.replaceChild(this.e.main, this.placeholder);
+                    this.placeholder = false;
+                }
             }
-            return '<li>' + text + '</li>';
-        };
-        return marked(content, {renderer: render});
+        },
+
+        // Special :: Markup
+        markup: {
+            type: "select",
+            values: function(){
+                var object = {};
+                for(var key in markups.markups){
+                    object[key] = key;
+                }
+                return object;
+            },
+            selected: function(){
+                return this.con.markup;
+            },
+            syntax: false,
+            action: function(markup, action, type, args){
+                if(!(args[0] in markups.markups)){
+                    this.error("errorMarkup");
+                    return false;
+                }
+                this.config("markup", args[0], true);
+                return true;
+            }
+        },
+
+        // Special :: About
+        about: {
+            syntax: false,
+            action: function(markup, action, type){
+                var status = writer.status.split("")[0].toUpperCase() + writer.status.slice(1);
+                var version = "v." + writer.version + " (" + status + ")";
+                var content = ''
+                    + '<div class="about">'
+                    + '    <div class="about-top">'
+                    + '        <div class="about-logo">tail.<span>writer</span> ' + version + '</div>'
+                    + '        <div class="about-desc">' + this.translate("aboutDesc1") + '</div>'
+                    + '        <div class="about-desc">' + this.translate("aboutDesc2") + '</div>'
+                    + '        <a href="https://www.pytes.net" target="_blank" class="pytesnet-logo">'
+                    + '        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.41421"><path d="M17.344 6.354c.123-1.212.239-2.305.342-3.399.052-.556.228-.661.712-.376 1.042.613 2.081 1.233 3.119 1.852 1.235.737 2.465 1.483 3.705 2.21.242.142.346.301.324.582-.032.401-.005.808-.053 1.206-.035.279.087.417.285.562 1.63 1.187 3.258 2.378 4.879 3.578.107.079.237.252.216.352-.026.117-.189.237-.319.293-.405.172-.822.314-1.278.484.577.878 1.129 1.719 1.683 2.559.296.449.609.889.888 1.349.186.306-.034.437-.292.513-.512.151-1.027.295-1.59.456.658 1.17 1.297 2.295 1.917 3.43.084.154.071.36.103.542-.173.013-.353.062-.519.032-.593-.105-1.181-.237-1.82-.369.258 1.412.503 2.76.749 4.108.068.371.151.74.197 1.114.015.123-.024.313-.109.372-.085.059-.282.036-.388-.024-.902-.512-1.791-1.046-2.695-1.556-.164-.093-.377-.155-.563-.145-3.571.195-7.142.384-10.709.63-.54.037-1.069.336-1.59.546-1.834.739-3.663 1.491-5.492 2.241-.295.121-.559.102-.845-.058-1.94-1.084-3.881-2.166-5.835-3.224-.508-.275-.641-.783-.883-1.218-.477-.858-.899-1.748-1.347-2.623-.218-.426-.197-.529.232-.768 2.839-1.578 5.669-3.169 8.527-4.712.528-.285.602-.765.786-1.199.63-1.484 1.227-2.983 1.816-4.484.184-.471.601-.626.984-.834.319-.174.646-.338.982-.473.293-.117.387-.291.381-.609-.028-1.49-.03-2.98-.032-4.47 0-.131.045-.345.122-.373.125-.046.321-.011.44.064.821.513 1.628 1.048 2.444 1.569.148.095.315.163.526.27zM5.116 27.227c1.115.618 2.166 1.211 3.23 1.779.145.078.372.085.531.034.445-.144.874-.337 1.311-.508 3.055-1.197 6.111-2.392 9.165-3.593.309-.121.632-.238.9-.426 1.055-.739 2.087-1.512 3.142-2.253.113-.079.314-.031.475-.042-.074.136-.115.315-.227.402-.585.453-1.175.899-1.787 1.315-.718.489-1.344 1.12-2.207 1.393-.698.22-1.378.494-2.066.744.12.077.223.073.325.067 2.947-.166 5.894-.34 8.843-.486.301-.015.638.086.91.227.655.34 1.28.738 1.92 1.107.14.081.293.138.494.231-.028-.218-.039-.351-.063-.482-.269-1.468-.542-2.936-.81-4.405-.101-.551.028-.672.573-.551.519.116 1.04.226 1.63.354-.062-.137-.085-.196-.115-.251-.568-1.026-1.14-2.05-1.704-3.078-.211-.385-.134-.547.288-.673.473-.14.947-.281 1.529-.455-.116-.14-.202-.227-.269-.328-.737-1.11-1.469-2.224-2.208-3.333-.271-.406-.211-.606.258-.78.336-.125.67-.255 1.075-.409-.171-.133-.282-.223-.398-.308-1.238-.909-2.431-1.894-3.733-2.701-.942-.584-1.29-1.275-1.049-2.317.072-.307-.068-.485-.335-.641-1.465-.858-2.919-1.735-4.377-2.603-.722-.431-1.447-.859-2.204-1.308-.026.145-.049.234-.058.325-.145 1.527-.291 3.054-.431 4.582-.031.348-.165.571-.509.736-1.627.781-3.24 1.592-4.851 2.407-.148.075-.291.236-.356.39-.729 1.739-1.434 3.488-2.169 5.224-.091.214-.284.431-.486.545-1.808 1.024-3.635 2.012-5.437 3.043-.322.185-.567.511-.829.79-.146.154-.252.346-.379.519-.432.583-.872 1.162-1.293 1.754-.063.089-.094.266-.049.357.32.653.657 1.298 1.005 1.937.066.121.19.228.311.298.535.309 1.087.589 1.617.907.28.168.509.151.776-.018.933-.59 1.875-1.166 2.815-1.744 1.077-.664 2.148-1.337 3.239-1.977.228-.134.532-.202.798-.194 1.171.038 2.341.114 3.511.179.12.007.249.011.355.058.064.027.132.14.125.205-.008.067-.099.158-.169.174-.114.026-.24 0-.36-.006-1.168-.058-2.336-.121-3.504-.167-.162-.006-.349.041-.488.124-1.097.659-2.186 1.331-3.276 2.002-.963.592-1.923 1.189-2.955 1.828zm9.138-22.272c.014 1.558.028 3.016.042 4.527.813-.398 1.512-.779 2.242-1.086.509-.213.754-.51.72-1.075-.014-.221.029-.417-.19-.557-.907-.58-1.812-1.164-2.814-1.809zM11.403 16.02c.309-.543.585-1.037.868-1.526.594-1.024 1.199-2.04 1.781-3.07.18-.32.367-.335.646-.145.691.468 1.391.922 2.083 1.388.321.215.315.439-.018.641-1.609.981-3.218 1.962-4.836 2.929-.109.065-.291.043-.428.011-.052-.012-.072-.165-.096-.228zm3.059-4.343c-.698 1.217-1.362 2.376-2.026 3.535.039.031.079.061.118.092 1.263-.764 2.527-1.528 3.859-2.334-.695-.461-1.296-.859-1.951-1.293z"/></svg>'
+                    + '         </a>'
+                    + '    </div>'
+                    + '    <div class="about-bottom">'
+                    + '        <div class="about-desc">' + this.translate("aboutDevelop", '<a href="https://www.github.com/pytesNET" target="_blank">pytesNET</a>') + '</div>'
+                    + '        <div class="about-desc">' + this.translate("aboutDesign", '<a href="https://octicons.github.com" target="_blank">Octicon Font 8.1.0</a>') + '</div>'
+                    + '        <div class="about-desc about-links">'
+                    + '            <a href="https://www.github.com/pytesNET/tail.writer" target="_blank">' + this.translate("aboutLink1") + '</a>'
+                    + '            <a href="https://www.github.com/pytesNET/tail.writer/wiki" target="_blank">' + this.translate("aboutLink2") + '</a>'
+                    + '            <a href="https://github.pytes.net/tail.writer" target="_blank">' + this.translate("aboutLink3") + '</a>'
+                    + '            <a href="https://www.github.com/pytesNET/tail.writer/issues/new" target="_blank">' + this.translate("aboutLink4") + '</a>'
+                    + '        </div>'
+                    + '    </div>'
+                    + '</div>';
+                this.showElement("dialog", "about", content);
+            }
+        }
     };
 
     /*
-     |  API :: EXTEND ACTION BUTTON
-     |  @since  0.2.0
-     |  @update 0.3.0
+     |  MARKUPS :: REGISTER A NEW MARKUP
+     |  @version    0.4.0 [0.4.0]
+     |
+     |  @param  string  The unique Markup ID.
+     |  @param  object  The action button objects.
+     |  @param  object  The 'default', 'full' and 'minimal' toolbar sets
+     |  @param  callb.  The callback function for the preview action.
+     |
+     |  @return bool    TRUE if everything is fluffy, FALSE if not.
      */
-    tailWriter.extend = function(type, action, strings){
-        if(tailWriter.actions.hasOwnProperty(type)){
-            return false;
+    writer.markups.register = function(id, actions, toolbars, renderer){
+        actions = (typeof(actions) == "function")? actions.call(this): actions;
+
+        // Add Markup
+        if(!(id in this.markups)){
+            this.markups[id] = {
+                actions: {},
+                walkers: {},
+                toolbars: toolbars,
+                renderer: renderer || function(_){ return _; }
+            }
         }
-        if(typeof(action) != "object" || typeof(strings) != "object"){
-            return false;
+        var m = this.markups[id];
+
+        // Loop Actions
+        for(var key in actions){
+            if(typeof(actions[key].walker) !== "undefined" && actions[key].walker){
+                if(typeof(actions[key].walker) === "function"){
+                    m.walkers[key] = actions[key].walker;
+                } else if(actions[key].walker === true && actions[key].syntax.substr){
+                    m.walkers[key] = actions[key].syntax.substr(0, actions[key].syntax.indexOf("$1"));
+                }
+            }
+            m.actions[key] = actions[key];
         }
 
-        // Add Action and Strings
-        tailWriter.actions[type] = action;
-        tailWriter.strings = Object.assign(tailWriter.strings, strings);
+        // Return
+        if(writer.defaults.markup == null){
+            writer.defaults.markup = id;
+        }
         return true;
     };
 
     /*
-     |  METHODS
+     |  MARKUPS :: UNREGISTER AN EXISTING MARKUP
+     |  @version    0.4.0 [0.4.0]
+     |
+     |  @param  string  The unique Markup ID.
+     |
+     |  @return bool    TRUE if everything is fluffy, FALSE if not.
      */
-    tailWriter.prototype = {
-        e: {},              // Elements
-        id: 0,              // Unique ID
-        con: {},            // Configuration
+    writer.markups.unregister = function(id){
+        if(!(id in this.markups)){
+            return false;
+        }
+        delete this.markups[id];
+        return true;
+    };
 
-        val: "",            // Current Value
-        walk: false,        // Walker
-        lines: {},          // Lines
-        indent: 0,          // Current Indent Size
-        current: 0,         // Current Action
-        dialogs: [],        // Current Dialogs
-        dropdowns: [],      // Current Dropdowns
+    /*
+     |  MARKUPS :: INSTANCE PROTOTYPE
+     */
+    writer.markups.prototype = {
+        /*
+         |  GET A MARKUP ACTION
+         |  @version    0.4.0 [0.4.0]
+         */
+        get: function(id, args){
+            if(args === false){
+                args = id.split(":");
+                id = args.shift();
+            }
+            args = (args instanceof Array)? args: [];
+
+            // Get Action
+            if(id in this.actions){
+                var action = this.actions[id];
+            } else if(id in markups.globals){
+                var action = markups.globals[id];
+            } else {
+                return false;
+            }
+
+            // Handle Main Data
+            action.id = id;
+            action.type = (action.type)? action.type: "button";
+            action.params = args;
+            action.classes = "action-" + id + ((args.length)? " action-" + id + "-" + args.join("-"): "");
+
+            // Handle Syntax
+            if(typeof(action.syntax) == "function"){
+                action.markup = action.syntax.apply(this.self, (args.join)? args: [args]);
+            } else {
+                action.markup = action.syntax;
+            }
+
+            // Handle Title
+            if(typeof(action.title) == "function"){
+                action.string = action.title.apply(this.self, args);
+            } else {
+                action.string = id;
+            }
+            return action;
+        },
 
         /*
-         |  INSTANCE :: BUILD EDITOR
-         |  @since  0.2.0
-         |  @update 0.3.0
+         |  SET A MARKUP ACTION - ON THE FLY
+         |  @version    0.4.0 [0.4.0]
+         */
+        set: function(id, action){
+            if(typeof(action.walker) === "function"){
+                this.walker[id] = action.walker;
+            } else if(action.walker === true && action.syntax.substr){
+                this.walker[id] = action.syntax.substr(0, action.syntax.indexOf("$1"));
+            } else if(type in this.walker){
+                delete this.walker[id];
+            }
+            this.actions[id] = action;
+            return true;
+        },
+
+        /*
+         |  SET TOOLBAR
+         |  @version    0.4.0 [0.4.0]
+         */
+        setToolbar: function(toolbar){
+            if(typeof(toolbar) === "string"){
+                if(!(toolbar in this.toolbars)){
+                    toolbar = "default";
+                }
+                this.toolbar = this.toolbars[toolbar];
+            } else if(typeof(toolbar) === "function"){
+                this.toolbar = toolbar.call(this.self, this.self.con.markup, this);
+            } else {
+                this.toolbar = (toolbar instanceof Array)? toolbar: [];
+            }
+            return true;
+        },
+
+        /*
+         |  LOOP TOOLBAR
+         |  @version    0.4.0 [0.4.0]
+         */
+        loopToolbar: function(){
+            if(!(this.toolbar instanceof Array)){
+                return false;
+            }
+
+            // Init
+            if(typeof(this._toolbarItem) === "undefined"){
+                this._toolbarItem = 0;
+            }
+
+            // Walk
+            if(this._toolbarItem < this.toolbar.length){
+                return this.toolbar[this._toolbarItem++];
+            }
+            this._toolbarItem = false;
+            return false;
+        },
+
+        /*
+         |  APPLY ACTION FILTER
+         |  @version    0.4.0 [0.4.0]
+         */
+        filter: function(id, before, content, after, selection){
+            var action = this.get(id, false);
+            if(typeof(action.filter) === "function"){
+                return action.filter.call(this.self, before, content, after, selection);
+            }
+            return content;
+        }
+    }
+
+    /*
+     |  STORAGE :: STRINGS
+     */
+    writer.strings = {
+        en: {
+            chars: "Characters",
+            lines: "Lines",
+            words: "Words",
+
+            // Markups
+            bbcode: "BBCode",
+            markdown: "Markdown",
+            textile: "Textile",
+
+            // Actions
+            about: "About",
+            aboutDevelop: "Developed by $1",
+            aboutDesc1: "written in pure vanilla JavaScript",
+            aboutDesc2: "published under the MIT License",
+            aboutDesign: "Designed with $1",
+            aboutLink1: "GitHub Repository",
+            aboutLink2: "Documentation",
+            aboutLink3: "Demonstration",
+            aboutLink4: "Report a Bug",
+            fullscreen: "Toggle Fullscreen",
+            indent: "Indent",
+            markup: "Change Markup",
+            modeWrite: "Write",
+            modePreview: "Preview",
+            outdent: "Outdent",
+            preview: "Toggle Preview",
+            previewEmpty: "There is nothing to Preview yet!",
+
+            // Debug
+            errorAction: "The passed action is unknown!",
+            errorMarkup: "The passed markup doesn't exist!",
+
+            // Markups
+            acronym: "Acronym",
+            big: "Big",
+            bold: "Bold",
+            center: "Center Paragraph",
+            cite: "Citation",
+            code: "Code (Inline)",
+            codeblock: "Code (Block)",
+            color: "Text Color",
+            definition: "Definition List",
+            emphasize: "Emphasize",
+            email: "eMail",
+            emailAddress: "eMail Address",
+            emailButton: "Embed eMail Link",
+            emailTitle: "eMail Title",
+            font: "Font Family",
+            header: "Heading",
+            headers: "Headings",
+            hr: "Horizontal Rule",
+            image: "Image",
+            imageButton: "Embed Image",
+            imageTitle: "Image Title",
+            imageURL: "Image URL",
+            italic: "Italic",
+            justify: "Justify Paragraph",
+            left: "Left Paragraph",
+            link: "Hyperlink",
+            linkNewTab: "Open Link in a new Tab",
+            linkButton: "Embed Link",
+            linkTitle: "Link Title",
+            linkURL: "Link URL",
+            listOrdered: "Ordered List",
+            listUnordered: "Unordered List",
+            listChecked: "Checked List",
+            listUnchecked: "Unchecked List",
+            pre: "Pre-Formatted Text",
+            quote: "Blockquote",
+            right: "Right Paragraph",
+            size: "Text Size",
+            small: "Small",
+            span: "Span",
+            strikethrough: "Strikethrough",
+            strong: "Strong",
+            sub: "Subscript",
+            sup: "Superscript",
+            table: "Table",
+            tableButton: "Embed Table",
+            tableHeader: "Add Table Header",
+            tableFooter: "Add Table Footer",
+            tableCols: "Columns",
+            tableRows: "Rows",
+            underline: "Underline"
+        },
+
+        /*
+         |  REGISTER A NEW LOCALE
+         |  @version    0.4.0 [0.4.0]
+         */
+        register: function(locale, object){
+            if(typeof(locale) != "string" || !(object instanceof Object)){
+                return false;
+            }
+            this[locale] = object;
+            return true;
+        },
+
+        /*
+         |  UNREGISTER A EXISTING LOCALE
+         |  @version    0.4.0 [0.4.0]
+         */
+        unregister: function(locale){
+            if(!(locale in this)){
+                return false;
+            }
+            delete this[locale];
+            return true;
+        },
+
+        /*
+         |  GET A LOCALE STRING
+         |  @version    0.4.0 [0.4.0]
+         */
+        get: function(locale, id){
+            if(!(id in (this[locale] || {}))){
+                return id;
+            }
+            return this[locale][id];
+        },
+
+        /*
+         |  SET / MODIFY LOCALE STRINGs
+         |  @version    0.4.0 [0.4.0]
+         */
+        set: function(locale, id, string){
+            if(!(locale in this)){
+                return false;
+            }
+            if((id instanceof Object)){
+                for(var key in id){
+                    this.set(locale, key, id[key]);
+                }
+            } else {
+                this[locale][id] = (typeof(string) == "string")? string: this[locale][id];
+            }
+            return true;
+        }
+    };
+
+    /*
+     |  WRITER HOOK
+     */
+    writer.hook = function(id, plugin, callback){
+        if(typeof(id) !== "string" || typeof(plugin) !== "string"){
+            return false;
+        }
+        if(!(id in this.hooks)){
+            this.hooks[id] = {};
+        }
+        if(plugin in this.hooks[id] || typeof(callback) !== "function"){
+            return false;
+        }
+        this.hooks[id][plugin] = callback;
+        return true;
+    };
+    writer.load = function(id, args){
+        if(!(args instanceof Array)){
+            args = [null];
+        }
+
+        // Hook
+        if(!(id in writer.hooks)){
+            return args[0];
+        }
+        for(var key in writer.hooks[id]){
+            args[0] = writer.hooks[id][key].apply(this, args);
+        }
+        return args[0];
+    }
+    writer.hooks = {};
+
+    /*
+     |  WRITER PROTOTYPE
+     */
+    writer.prototype = {
+        /*
+         |  INTERNAL :: INIT WRITER
+         |  @version    0.4.0 [0.4.0]
+         */
+        init: function(){
+            var self = this;
+            self.__  = writer.strings[this.con.locale] || writer.strings.en;
+            self.val = this.e.editor.value;
+
+            // Check Markup
+            this.markup = new markups(this, this.con.markup);
+            this.markup.setToolbar(this.con.toolbar);
+            this.build();
+
+            // Event & Key Listeners (Unique Attacher)
+            if(this.firstInit !== true && !this.con.preventBindings){
+                for(var ev in {click: 1, input: 1, keydown: 1, keypress: 1, keyup: 1}){
+                    this.e.editor.addEventListener(ev, function(event){
+                        self.handle.call(self, event);
+                        self.resize.call(self, true);
+                        self.update.call(self);
+                    });
+                }
+                d.body.onresize = function(){
+                    self.toolbarResize.call(self);
+                };
+
+                // Key Listener :: F1
+                this.bind(112, function(event){
+                    event.preventDefault();
+                    return this.perform("about", []);
+                }, 0, 0, 0, "keydown");
+
+                // Key Listener :: F11
+                this.bind(122, function(event){
+                    event.preventDefault();
+                    this.perform("fullscreen", []);
+                    this.e.editor.focus();
+                    return this;
+                }, 0, 0, 0, "keydown");
+
+                // Key Listener :: Walker
+                this.bind(13, function(event){
+                    this.walker = false;
+                    if((this.walker = this.walkable(this.currentLine())) !== false){
+                        event.preventDefault();
+                        var walker = this.walker.split(":");
+                        this.setContent("\n", "append", null, null);
+                        return this.perform(walker[0], (walker[1] || "").split(","));
+                    }
+                    if(this.con.doubleLineBreak){
+                        this.writeContent("\n");
+                    }
+                    return true;
+                }, 0, 0, 0, "keydown");
+
+                // Key Listener :: Indent
+                this.bind(9, function(event){
+                    event.preventDefault();
+                    return this.perform("indent", []);
+                }, 0, 0, 0, "keydown");
+
+                // Key Listener :: Outdent
+                this.bind(9, function(event){
+                    event.preventDefault();
+                    return this.perform("outdent", []);
+                }, 1, 0, 0, "keydown");
+
+                // Key Listener :: Duplicate
+                this.bind(68, function(event){
+                    event.preventDefault();
+                    var sel = this.selection();
+                    if(sel.start === sel.end){
+                        return this.writeContent("\n" + this.currentLine());
+                    }
+                    var val = this.getContent(sel);
+                    this.selection(sel.end, sel.end);
+                    return this.writeContent(val, {start: sel.end, end: sel.end + val.length});
+                }, 0, 1, 0, "keydown");
+
+                // Key Listener :: Cut Line
+                this.bind(88, function(event){
+                    event.preventDefault();
+                    var sel = this.selection();
+                    if(sel.start !== sel.end){
+                        var val = this.getContent(sel);
+                    } else {
+                        var start = this.val.slice(0, sel.start).split("\n"),
+                            end = this.val.slice(sel.start).split("\n"),
+                            line = start.pop() + end.shift();
+                        sel.start = start.join("\n").length
+                        sel.end = sel.start + line.length + 1;
+                        this.selection(sel.start, sel.end);
+                    }
+                    if(d.execCommand){
+                        d.execCommand("copy");
+                    }
+                    return this.writeContent("", { start: sel.start, end: sel.start });
+                }, 0, 1, 0, "keydown");
+            }
+
+            // Apply States
+            this.e.editor.disabled = (this.con.disabled === true);
+            this.e.editor.readOnly = (this.con.readonly === true);
+
+            // Load Plugins & Return
+            writer.load.call(this, "init");
+            this.resize(false);
+            this.firstInit = true;
+            return this;
+        },
+
+        /*
+         |  INTERNAL :: BUILD WRITER
+         |  @version    0.4.0 [0.2.0]
          */
         build: function(){
-            var self = this; this.read();
+            var self = this, classes = ["tail-writer"], con = this.con,
+                regexp = /^[0-9.]+(?:cm|mm|in|px|pt|pc|em|ex|ch|rem|vw|vh|vmin|vmax|\%)$/i;
 
-            // Editor Container
-            this.e.container = d.createElement("div");
-            this.e.container.className = "tail-writer-object " + this.con.classes;
-            this.e.container.style.width = this.con.width;
-            this.e.container.setAttribute("tail-writer-object", this.id);
+            // Init ClassNames
+            var c = (con.classNames === true)? this.e.editor.className: con.classNames;
+            classes.push((c && c.push)? c.join(" "): (c && c.split)? c: "");
+            if(con.disabled){ classes.push("disabled"); }
+            if(con.readonly){ classes.push("readonly"); }
 
-            var parent = this.e.editor.parentElement;
-            this.e.container.appendChild(this.e.editor);
-            parent.appendChild(this.e.container);
-
-            // Create Toolbar
-            this.e.toolbar = d.createElement("div");
-            this.e.toolbar.className = "tail-writer-toolbar tail-writer-toolbar-" + this.con.toolbarPosition;
-            this.e.toolbar.setAttribute("data-writer-toolbar", this.con.toolbarPosition);
-            this.e.container.insertBefore(this.e.toolbar, this.e.editor)
-
-            for(var i = 0; i < this.con.toolbar.length; i++){
-                var type   = this.con.toolbar[i].split(":"),
-                    args   = (type.length > 1? type[1].split(","): []),
-                    action = _action(type[0], args);
-
-                if(type[0] !== "|" && action == false){
-                    continue;
-                }
-
-                // Create Action
-                if(type[0] === "|"){
-                    var button = d.createElement("span");
-                        button.className = "tail-writer-sep";
-                } else {
-                    var button = d.createElement("button");
-                        button.className = "tail-writer-button icon-" + action.id;
-                        button.className = "tail-writer-button icon-" + action.id;
-                        button.setAttribute("data-writer-title", action.string);
-                        button.setAttribute("data-writer-action", type[0] + ((args.length > 0)? "-" + args.join("-"): ""));
-                    button.addEventListener("click", function(event){
-                        event.preventDefault();
-
-                        if(tail.hasClass(event.target, "tail-writer-button")){
-                            var removed = self.hideDropdown.call(self);
-                            if(removed.indexOf(this.getAttribute("data-writer-action") == -1)){
-                                var args = this.getAttribute("data-writer-action").split("-");
-                                self.current = this;
-                                self.perform.call(self, args.shift(), args);
-                            }
-                        }
-                    });
-
-                    // Add Tooltip
-                    if(this.con.tooltip !== false){
-                        button.addEventListener("mouseover", function(event){
-                            self.tooltip.call(self, event, this);
-                        });
-                        button.addEventListener("mouseout", function(event){
-                            self.tooltip.call(self, event, this);
-                        });
-                    }
-                }
-                this.e.toolbar.appendChild(button);
-            };
-
-            // Create Statusbar
-            if(this.con.statusbar){
-                this.e.statusbar = d.createElement("div");
-                this.e.statusbar.className = "tail-writer-statusbar";
-                this.e.statusbar.innerHTML = '' +
-                    '<div class="tail-writer-lines">' + __("lineCounter") + ': <span class="tail-writer-count"></span></div>' +
-                    '<div class="tail-writer-chars">' + __("charCounter") + ': <span class="tail-writer-count"></span></div>' +
-                    '<div class="tail-writer-words">' + __("wordCounter") + ': <span class="tail-writer-count"></span></div>';
-                this.e.container.appendChild(this.e.statusbar);
-                this.statusbar();
-            }
-
-            // Editor Field
-            this.e.editor.setAttribute("data-writer-editor", this.id);
-            if(!isNaN(parseInt(this.con.height[0]))){
-                var height = parseInt(this.con.height[0]);
+            // Create & Append Editor
+            this.e.main = create("DIV", classes);
+            if(con.width && regexp.test(con.width)){
+                this.e.main.style.width = con.width;
+            } else if(con.width && !isNaN(parseFloat(con.width, 10))){
+                this.e.main.style.width = con.width + "px";
             } else {
-                var height = parseInt(this.e.container.outerHeight);
-                if(height < 200){
-                    height = 200;
-                }
+                this.e.main.style.width = "100%";
             }
-            this.e.editor.style.width = parseInt(this.con.width) + "%";
+            this.e.editor.setAttribute("data-tail-writer", "tail-" + this.id);
+            this.e.editor.parentElement.replaceChild(this.e.main, this.e.editor);
+            this.e.main.appendChild(this.e.editor);
+
+            // Build Bars
+            this.toolbar();
+            this.statusbar();
+
+            // Calculate Height
+            if(!(con.height instanceof Array)){
+                con.height = [con.height, con.height];
+            }
+            if(regexp.test(con.height[0])){
+                this.e.editor.style.height = con.height[0];
+            } else if(!isNaN(parseFloat(con.height[0], 10))){
+                this.e.editor.style.height = con.height[0] + "px";
+            } else {
+                this.e.editor.style.height = "250px";
+            }
+            var th = w.getComputedStyle(this.e.tools);
+            th = this.e.tools.offsetHeight + Math.max(parseInt(th.marginTop), 0) + Math.max(parseInt(th.marginBottom), 0);
+            var sh = w.getComputedStyle(this.e.status);
+            if(typeof(sh) !== "object"){
+                sh = 0;
+            } else {
+                sh = this.e.status.offsetHeight + Math.max(parseInt(sh.marginTop), 0) + Math.max(parseInt(sh.marginBottom), 0);
+            }
+            var height = this.e.editor.offsetHeight - (th + sh + 2);
+
+            // Append Height
+            this.e.editor.className += " tail-writer-editor";
             this.e.editor.style.height = height + "px";
             this.e.editor.style.minHeight = height + "px";
-            if(!isNaN(parseInt(this.con.height[1]))){
-                this.e.editor.style.maxHeight = parseInt(this.con.height[1]) + "px";
-            }
-            if(this.con.indent){
-                this.e.editor.style.tabSize = this.con.indentSize;
-            }
-            this.e.editor.className += " tail-writer-editor";
-
-            // Event Handling
-            var events = ["click", "input", "change", "keydown", "keyup"];
-            for(var i = 0; i < events.length; i++){
-                this.e.editor.addEventListener(events[i], function(event){
-                    self.handle.call(self, event);
-                });
+            if(con.height[0] === con.height[1] || !con.height[1]){
+                this.e.editor.style.maxHeight = height + "px";
+            } else {
+                if(regexp.test(con.height[1])){
+                    this.e.editor.style.maxHeight = con.height[1];
+                } else if(!isNaN(parseFloat(con.height[1], 10))){
+                    this.e.editor.style.maxHeight = con.height[1] + "px";
+                }
             }
 
-            if(this.con.resize){
-                this.resize(false);
+            // Tab Size
+            if(con.indentTab){
+                this.e.editor.style.tabSize = con.indentSize;
             }
             return this;
         },
 
         /*
-         |  HANDLE :: EDITOR
-         |  @since  0.2.0
-         |  @update 0.3.1
+         |  INTERNAL :: BUILD TOOLBAR
+         |  @version    0.4.0 [0.4.0]
          */
-        handle: function(event){
-            var self = this; this.read();
+        toolbar: function(){
+            var inner = create("DIV", "toolbar-inner");
+            this.e.tools = create("DIV", "tail-writer-toolbar");
+            this.e.tools.appendChild(inner);
 
-            // On Click
-            if(event.type == "click"){
-                this.hideDropdown.call(this);
+            // Loop Toolbar
+            var self = this, item, tool, action, key, opt, values, kev, scroller, replace;
+            while(item = this.markup.loopToolbar()){
+                if(item === "$" && this.con.multiLineBreak){
+                    inner.appendChild(create("DIV", "toolbar-linebreak"));
+                    continue;
+                } else if(item === "|"){
+                    inner.appendChild(create("SPAN", "toolbar-separator"));
+                    continue;
+                } else if(!(action = this.markup.get(item, false))){
+                    continue;
+                }
+
+                // Render :: Button
+                if(action.type === "button"){
+                    tool = create("BUTTON", "toolbar-action " + action.classes);
+                    tool.addEventListener("click", function(event){
+                        event.preventDefault();
+                        if(self.con.disabled || cHAS(event.target, "disabled")){
+                            return false;
+                        }
+                        return self.perform.call(self, this.getAttribute("data-writer-action"), false);
+                    });
+                } else
+
+                // Render :: Select
+                if(action.type === "select"){
+                    tool = create("SELECT", "toolbar-action " + action.classes);
+                    tool.addEventListener("change", function(event){
+                        if(self.con.disabled || cHAS(event.target, "disabled")){
+                            return false;
+                        }
+                        var handle = this.getAttribute("data-writer-action") + ":" + this.value;
+                        return self.perform.call(self, handle, false);
+                    });
+
+                    // Add Options
+                    sel = (action.selected.call)? action.selected.call(this): action.selected;
+                    values = (action.values.call)? action.values.call(this): action.values;
+                    if(typeof(values) === "object"){
+                        for(key in values){
+                            opt = create("OPTION");
+                            opt.value = key;
+                            opt.selected = (opt.value === sel);
+                            opt.innerText = this.translate(values[key]);
+                            tool.appendChild(opt);
+                        }
+                    } else {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+
+                // Add Tooltip
+                for(kev in {mouseover: 1, mouseout: 1, click: 1}){
+                    tool.addEventListener(kev, function(ev){ self.tooltip.call(self, ev, this); });
+                }
+
+                // Add Tool
+                tool.setAttribute("data-writer-action", item);
+                tool.setAttribute("data-writer-tooltip", this.translate(action.string));
+                if(action.toolbar && typeof(action.toolbar) === "function"){
+                    tool = action.toolbar.call(this, tool);
+                }
+                inner.appendChild(tool);
             }
 
-            // Listen for Keys
-            if(event.type === "keydown"){
+            // Scrollable Toolbar
+            if(!this.con.toolbarMultiLine){
+                inner.style.overflow = "hidden";
+                inner.style.whiteSpace = "nowrap";
+                if(this.con.toolbarScrollable){
+                    for(var dir in {left: 1, right: 1}){
+                        scroller = create("BUTTON", "toolbar-scroll action-scroll-" + dir);
+                        scroller.setAttribute("tail-writer-action", "scroll-" + dir);
+                        scroller.addEventListener("click", function(event){
+                            event.preventDefault();
+                            var el = this.parentElement.querySelector(".toolbar-inner"),
+                                dir = this.getAttribute("tail-writer-action"),
+                                calc = el.scrollLeft + (dir == "scroll-right"? +105: -105);
 
-                // CTRL + X (Cut Line)
-                if(event.ctrlKey && event.keyCode == 88){
-                    event.preventDefault();
 
-                    var sel = this.selection();
-                    if(sel.start == sel.end){
-                        var linestart = -1, lineend = sel.end;
-                        while(sel.start > -1){
-                            linestart = (sel.start > 0)? this.val.indexOf("\n", sel.start--): 0;
-                            if(sel.start < 0 || (linestart > -1 && linestart < lineend)){
-                                sel.start = linestart;
-                                sel.end   = linestart + this.lines.current.length + 1;
-                                break;
+                            if(el.scrollTo){
+                                el.scrollTo({ top: 0, left: calc, behavior: "smooth" });
+                            } else {
+                                el.scrollLeft = calc;
                             }
-                        }
+                        })
+                        this.e.tools.insertBefore(scroller, this.e.tools.children[0]);
                     }
-                    //@todo Clipboard Binding
-                    this.write(this.val.slice(0, sel.start) + this.val.slice(sel.end));
-                    this.selection(sel.start+1, sel.start+1);
+                }
+            }
+
+            // Append and Return
+            if((replace = this.e.main.querySelector(".tail-writer-toolbar")) !== null){
+                this.e.main.replaceChild(this.e.tools, replace);
+            } else {
+                this.e.main.insertBefore(this.e.tools, this.e.main.children[0]);
+            }
+            return this.toolbarResize();
+        },
+
+        /*
+         |  INTERNAL :: HANDLE TOOLBAR NAVIGATION
+         |  @version    0.4.0 [0.4.0]
+         */
+        toolbarResize: function(){
+            if(!(!this.con.toolbarMultiLine && this.con.toolbarScrollable)){
+                return this;
+            }
+            var tools = this.e.tools.querySelector(".toolbar-inner");
+            if(tools.scrollWidth > tools.offsetWidth){
+                cADD(this.e.tools, "scrollable");
+            } else {
+                cREM(this.e.tools, "scrollable");
+            }
+            return this;
+        },
+
+        /*
+         |  INTERNAL :: BUILD STATUSBAR
+         |  @version    0.4.0 [0.4.0]
+         */
+        statusbar: function(){
+            this.e.status = create("DIV", "tail-writer-statusbar");
+
+            // Get Fields
+            if(typeof(this.con.statusbar) === "function"){
+                var fields = this.con.statusbar.call(this);
+                if(typeof(fields) !== "object"){
                     return false;
                 }
-
-                // CTRL + D (Duplicate Line)
-                if(event.ctrlKey && event.keyCode == 68){
-                    event.preventDefault();
-                    return this.writeLine("\n" + this.lines.current, "after");
-                }
-
-                // Tab
-                if(event.keyCode == 9){
-                    event.preventDefault();
-                    if(event.shiftKey){
-                        return this.perform("outdent", []);
-                    } else {
-                        return this.perform("indent", []);
-                    }
-                }
-
-                // Enter
-                if(event.keyCode == 13){
-                    if(this.walkable(this.lines.current)){
-                        event.preventDefault();
-                        this.writeLine(this.indenter("", "create"));
-                        return this.perform(this.walk[0], this.walk[1]);
-                    }
-                    return true;
-                }
-            }
-
-            // Modify Content
-            if(this.con.resize){
-                this.resize(true);
-            }
-            if(this.con.statusbar){
-                this.statusbar();
-            }
-        },
-
-        /*
-         |  HANDLE :: CHECK FOR AN WALKABLE CONTINUE
-         |  @since  0.2.0
-         |  @update 0.3.0
-         */
-        walkable: function(string){
-            if(!this.walk || string == undefined){
-                this.walk = false;
+            } else if(this.con.statusbar === false){
                 return false;
-            }
-            var action = _action(this.walk[0], this.walk[1]),
-                syntax = this.indenter(action.markup.replace("$1", ""));
-
-            // Check Lines
-            if(string.indexOf(syntax) < 0){
-                this.walk = false;
-                return false;
-            }
-            if(string == syntax){
-                this.writeLine("", "replace");
-                this.walk = false;
-                return false;
-            }
-            return true;
-        },
-
-        /*
-         |  HANDLE :: TOOLTIPs
-         |  @since  0.2.0
-         |  @update 0.3.2
-         */
-        tooltip: function(event, element){
-            if(this.con.tooltip == false){
-                return false;
-            }
-            var offset  = tail.position(event.target),
-                classes = "tail-writer-tooltip-" + event.target.getAttribute("data-writer-action");
-
-            if(!tail.hasClass(event.target.parentElement, "tail-writer-toolbar")){
-                return false;
-            }
-            if(event.type == "mouseover"){
-                if(tail.hasClass(event.target, "disabled")){
-                    return;
-                }
-                if(this.e.container.querySelectorAll("." + classes).length == 0){
-                    var tooltip = d.createElement("DIV");
-                        tooltip.innerText = __(event.target.getAttribute("data-writer-title"));
-                        tooltip.className = "tail-writer-tooltip tail-writer-tooltip-" + this.con.tooltip + " " + classes;
-                        tooltip.style.opacity = 0;
-                        tooltip.style.position = "absolute";
-                    this.e.container.insertBefore(tooltip, this.e.container.children[0]);
-
-                    // Calc Position
-                    var style = w.getComputedStyle(this.e.toolbar);
-                    if(this.con.tooltip == "bottom"){
-                        tooltip.style.top = (parseInt(style.top) + offset.height + tooltip.offsetHeight) + "px";
-                    } else {
-                        tooltip.style.top = "-2px";
-                    }
-                    tooltip.style.left = (parseInt(style.left) + offset.left + (offset.width/2) - (tooltip.offsetWidth/2)) + "px";
-
-                    // Animate
-                    if(this.con.animate){
-                        tail.animate(tooltip, function(element){
-                            if(parseFloat(element.style.opacity) < 1.0){
-                                element.style.opacity = parseFloat(element.style.opacity) + 0.1;
-                                return true;
-                            }
-                            return false;
-                        }, 10, true);
-                    } else {
-                        tooltip.style.opacity = 1;
-                    }
-                }
             } else {
-                var element = this.e.container.querySelector("." + classes);
-                if(element && this.con.animate){
-                    tail.animate(element, function(element){
-                        if(parseFloat(element.style.opacity) > 0.0){
-                            element.style.opacity = parseFloat(element.style.opacity) - 0.1;
-                            return true;
-                        }
-                        if(element.parentElement){
-                            element.parentElement.removeChild(element);
-                        }
-                        return false;
-                    }, 10, true);
-                } else if(element){
-                    if(element.parentElement){
-                        element.parentElement.removeChild(element);
-                    }
-                }
+                var fields = {}, count = this.count();
+                fields[this.translate("lines")] = count.lines;
+                fields[this.translate("chars")] = count.chars;
+                fields[this.translate("words")] = count.words;
             }
+
+            // Handle Fields
+            var inner = "";
+            for(var key in fields){
+                inner += '<div class="statusbar-field">'
+                      +  '    <span class="field-title">' + key + ':</span>'
+                      +  '    <span class="field-value">' + fields[key] + '</span>'
+                      +  '</div>';
+            }
+
+            // Create Statusbar
+            this.e.status.innerHTML = inner;
+            this.e.main.appendChild(this.e.status);
+
+            // Append and Return
+            var replace = this.e.main.querySelector(".tail-writer-statusbar");
+            if(replace !== null){
+                this.e.main.replaceChild(this.e.status, replace);
+            } else {
+                this.e.main.insertBefore(this.e.status, this.e.main.children[0]);
+            }
+            return this;
         },
 
         /*
-         |  HANDLE :: RESIZE
-         |  @since  0.2.0
-         |  @update 0.3.2
+         |  HANDLE :: COUNT DATA
+         |  @version    0.4.0 [0.4.0]
          */
-        resize: function(scroll){
-            var clone   = this.e.editor.cloneNode(),
-                style   = w.getComputedStyle(this.e.editor),
-                padding = parseInt(style.paddingTop) + parseInt(style.paddingBottom);
-
-            // Clone Element
-            clone.style.height = "auto";
-            clone.style.minHeight = "none";
-            clone.style.maxHeight = "none";
-            clone.style.opacity = 0;
-            clone.style.position = "position";
-            clone.value = this.val;
-            this.e.container.insertBefore(clone, this.e.editor);
-
-            // Get Data
-            var _toTop = clone.scrollTop,
-                height = clone.scrollHeight;
-            this.e.container.removeChild(clone, clone.selectionStart);
-
-            // Compare
-            this.e.editor.style.height = (height - padding) + "px";
-            if(scroll == true && this.e.editor.value.length - this.selection().start <= 3){
-                this.e.editor.scrollTop = (height - padding);
-            }
-        },
-
-        /*
-         |  HANDLE :: STATUSBAR
-         |  @since  0.2.0
-         |  @update 0.3.0
-         */
-        statusbar: function(action){
-            var data = {
+        count: function(){
+            var counts = {
+                lines: ((this.val.match(/^|\n/g) || [""]).length).toString(),
                 chars: (this.val.length).toString(),
-                lines: (this.val.match(/^|\n/g) || [""]).length.toString(),
-                words: "0".toString()
+                words: "0"
             };
 
             // Count Words
-            var words = this.val.trim().replace(/[\n\t\.]/g, " ").trim();
-                words = words.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s\s+/g, " ").split(" ");
+            var words = this.val.trim().replace(/[\:\-\.\?\!]/g, "").trim();
+                words = words.replace(/[\n\t\s]+/g, " ").replace(/[^\w\s]+/g, "").split(" ");
             if(words.length <= 1 && words[0].length == 0){
-                data.words =  0;
+                counts.words = "0";
             } else {
-                data.words = words.length;
+                counts.words = words.length.toString();
             }
-
-            // Count Selected
-            var sel = this.selection();
-            if(sel.start !== sel.end){
-                var __2   = this.val.slice(sel.start, sel.end);
-                    words = __2.trim().replace(/[\n\t\.]/g, " ").trim();
-                    words = words.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s\s+/g, " ").split(" ");
-
-                data.chars = '<span class="current">' + __2.length + ' / </span>' + data.chars;
-                data.lines = '<span class="current">' + (__2.match(/^|\n/g) || [""]).length + ' / </span>' + data.lines;
-                if(words.length <= 1 && words[0].length == 0){
-                    data.words = '<span class="current">0 / </span>' + data.words;
-                } else {
-                    data.words = '<span class="current">' + words.length + ' / </span>' + data.words;
-                }
-            }
-
-            // Inject
-            this.e.statusbar.querySelector(".tail-writer-lines span").innerHTML = data.lines;
-            this.e.statusbar.querySelector(".tail-writer-chars span").innerHTML = data.chars;
-            this.e.statusbar.querySelector(".tail-writer-words span").innerHTML = data.words;
+            return counts;
         },
 
         /*
-         |  HELPER :: (G|S)ET SELECTION
-         |  @since  0.2.0
-         |  @update 0.3.0
+         |  INTERNAL :: HANDLE EVENTS
+         |  @version    0.4.0 [0.2.0]
          */
-        selection: function(start, end){
-            if(start == undefined){
-                return {start: this.e.editor.selectionStart, end: this.e.editor.selectionEnd};
-            } else if(typeof(start) !== "number"){
-                start = this.val.length;
-            }
-            if(end == undefined){
-                end = start;
-            }
-            this.e.editor.focus();
-            this.e.editor.selectionStart = start;
-            this.e.editor.selectionEnd = end;
-            return true;
-        },
-
-        /*
-         |  HELPER :: INDENTER
-         |  @since  0.2.0
-         |  @update 0.3.0
-         */
-        indenter: function(string, action){
-            if(this.con.indentTab){
-                var indent = "\t";
-            } else {
-                var indent = Array(this.con.indentSize + 1).join(" ");
-            }
-
-            // Count
-            if(action === "count"){
-                var temp = string.replace(".", ""),
-                    rexp = new RegExp(indent, "gi");
-                    temp = temp.replace(rexp, ".").split(/([^\.])/);
-                if(typeof(temp) == "object" && temp.length > 0){
-                    return temp[0].length;
-                }
-                return 0;
-            }
-
-            // Create
-            if(action === "create"){
-                var lines = string.split("\n");
-                for(var i = 0; i < lines.length; i++){
-                    if(i === 0){
-                        continue;
-                    }
-                    lines[i] = Array((this.indent + 1)).join("\t") + lines[i];
-                }
-                string = lines.join("\n");
-            }
-
-            // Replace
-            if(!this.con.indentTab){
-                string = string.replace(/\t/g, indent);
-            }
-            return string;
-        },
-
-        /*
-         |  CORE :: READ CONTENT
-         |  @since  0.2.0
-         |  @update 0.3.0
-         */
-        read: function(){
-            this.val = this.indenter(this.e.editor.value);
-
-            // Split Content
-            var sel = this.selection(),
-                __p = this.val.slice(0, sel.start).split("\n"),
-                __n = this.val.slice(sel.start, this.val.length).split("\n");
-
-            // Get Lines
-            this.lines = {
-                "current":    __p.pop() + __n.shift(),
-                "previous":    (__p.length > 0)? __p.pop(): undefined,
-                "next":        (__n.length > 0)? __n.shift(): undefined,
-            };
-            this.indent = this.indenter(this.lines.current, "count");
-        },
-
-        /*
-         |  CORE :: WRITE CONTENT
-         |  @since  0.2.0
-         |  @update 0.3.0
-         */
-        write: function(content, selection){
-            this.e.editor.value = content;
-            if(typeof(selection) == "object"){
-                this.selection(selection.start, selection.end);
-            }
-            this.read();
-        },
-
-        /*
-         |  CORE :: WRITE LINE
-         |  @since  0.2.0
-         |  @update 0.3.0
-         */
-        writeLine: function(line, handle){
-            var sel = this.selection(),
-                __p = this.val.slice(0, sel.start).split("\n"),
-                __n = this.val.slice(sel.start, this.val.length).split("\n"),
-                __c = __p.pop() + __n.shift();
-
-                __p = ((__p.length > 0)? __p.join("\n") + "\n": "");
-                __n = ((__n.length > 0)? "\n" + __n.join("\n"): "");
-
-            if(handle == "replace"){
-                this.e.editor.value = __p + line + __n;
-                this.selection(__p.length + line.length);
-            } else if(handle == "before"){
-                this.e.editor.value = __p + line + __c + __n;
-                this.selection(__p.length + line.length + __c.split("\n")[0].length);
-            } else {
-                this.e.editor.value = __p + __c + line + __n;
-                this.selection(__p.length + line.length + __c.length);
-            }
-            this.read();
-        },
-
-        /*
-         |  CORE :: SHOW DROPDOWN
-         |  @since  0.2.0
-         |  @update 0.3.2
-         */
-        showDropdown: function(type, content, callback){
+        handle: function(event){
             var self = this;
-            if(tail.hasClass(this.current, "disabled")){
-                return;
-            }
 
-            // Create Dropdown
-            var dropdown = d.createElement("DIV");
-                dropdown.innerHTML = content;
-                dropdown.className = "tail-writer-dropdown tail-writer-dropdown-" + type;
-                dropdown.style.opacity = 0;
-                dropdown.style.position = "absolute";
-            this.e.container.appendChild(dropdown);
-
-            // Format Dropdown
-            var position = tail.position(this.current), style = w.getComputedStyle(this.e.toolbar);
-            dropdown.style.top = position.top + position.height + "px";
-            dropdown.style.left = position.left + parseInt(style.left) + "px";
-            dropdown.tailWriter = callback;
-
-            if(this.con.animate){
-                tail.animate(dropdown, function(element){
-                    if(parseFloat(element.style.opacity) < 1.0){
-                        element.style.opacity = parseFloat(element.style.opacity) + 0.1;
-                        return true;
-                    }
-                    return false;
-                }, 10, true);
-            } else {
-                dropdown.style.opacity = 1;
-            }
-
-            dropdown.querySelector("form").addEventListener("submit", function(event){
-                event.preventDefault();
-                if(this.parentElement.tailWriter.call(self, this.elements, event)){
-                    self.hideDropdown.call(self);
-                }
+            // Event Listener
+            trigger(this.e.main, "tail.writer::" + event.type, {
+                bubbles: false, cancelable: true, detail: {args: arguments, self: this}
             });
-        },
-
-        /*
-         |  CORE :: HIDE DROPDOWN
-         |  @since  0.2.0
-         |  @update 0.3.2
-         */
-        hideDropdown: function(){
-            var removed = new Array(),
-                dropdowns = this.e.container.querySelectorAll(".tail-writer-dropdown");
-            if(dropdowns.length > 0){
-                for(var i = 0; i < dropdowns.length; i++){
-                    removed.push(dropdowns[i].getAttribute("data-writer-dropdown"));
-
-                    if(this.con.animate){
-                        tail.animate(dropdowns[i], function(element){
-                            if(parseFloat(element.style.opacity) > 0.0){
-                                element.style.opacity = parseFloat(element.style.opacity) - 0.1;
-                                return true;
-                            }
-                            element.parentElement.removeChild(element);
-                            return false;
-                        }, 10, true);
-                    } else {
-                        dropdowns[i].parentElement.removeChild(dropdowns[i]);
+            for(var l = (this.events[event.type] || []).length, i = 0; i < l; i++){
+                this.events[event.type][i].cb.apply(this, (function(args, a, b){
+                    for(var l = a.length, i = 0; i < l; ++i){
+                        args[i-1] = a[i];
                     }
+                    args[i] = b;
+                    return args;
+                }(new Array(arguments.length), arguments, this.events[event.type][i].args)));
+            }
+
+            // On MouseClick
+            if(event.type == "click"){
+                var parent = event.target;
+                while(parent !== false){
+                    if(cHAS(parent, "tail-writer-dropdown") || cHAS(parent, "tail-writer-dialog")){
+                        parent = true;
+                        break;
+                    }
+                    if(cHAS(parent, "tail-writer")){
+                        parent = false;
+                        break;
+                    }
+                    parent = parent.parentElement;
                 }
-            }
-            return removed;
-        },
-
-        /*
-         |  CORE :: SHOW DIALOG
-         |  @since  0.2.0
-         |  @update 0.3.2
-         */
-        showDialog: function(type, content, callback){
-            var self = this;
-            if(tail.hasClass(this.current, "disabled")){
-                return;
-            }
-
-            // Create Mask
-            var mask = d.createElement("DIV");
-                mask.className = "tail-writer-mask";
-                mask.style.top = 0;
-                mask.style.left = 0;
-                mask.style.right = 0;
-                mask.style.bottom = 0;
-                mask.style.opacity = 0;
-                mask.style.position = "absolute";
-            mask.addEventListener("click", function(event){
-                self.hideDialog.call(self);
-            });
-            this.e.container.appendChild(mask);
-
-            if(this.con.animate){
-                tail.animate(mask, function(element){
-                    if(parseFloat(element.style.opacity) < 1.0){
-                        element.style.opacity = parseFloat(element.style.opacity) + 0.1;
-                        return true;
-                    }
-                    return false;
-                }, 10, true);
-            } else {
-                mask.style.opacity = 1;
-            }
-
-            // Create Dialog
-            var dialog = d.createElement("DIV");
-                dialog.innerHTML = content;
-                dialog.className = "tail-writer-dialog tail-writer-dialog-" + type;
-                dialog.style.display = "block";
-                dialog.style.opacity = 0;
-                dialog.style.position = "absolute";
-            this.e.container.appendChild(dialog);
-
-            // Format Dialog
-            dialog.style.top = (this.e.container.offsetHeight / 2 - dialog.offsetHeight / 2) + "px"
-            dialog.style.left = (this.e.container.offsetWidth / 2 - dialog.offsetWidth / 2) + "px";
-            dialog.tailWriter = callback;
-
-            if(this.con.animate){
-                tail.animate(dialog, function(element){
-                    if(parseFloat(element.style.opacity) < 1.0){
-                        element.style.opacity = parseFloat(element.style.opacity) + 0.1;
-                        return true;
-                    }
-                    return false;
-                }, 10, true);
-            } else {
-                dialog.style.opacity = 1;
-            }
-
-            dialog.querySelector("form").addEventListener("submit", function(event){
-                event.preventDefault();
-                if(this.parentElement.tailWriter.call(self, this.elements, event)){
-                    self.hideDialog.call(self);
+                if(!parent){
+                    this.hideElement("dialog");
+                    this.hideElement("dropdown");
                 }
-            });
-        },
-
-        /*
-         |  CORE :: HIDE DIALOG
-         |  @since  0.2.0
-         |  @update 0.3.2
-         */
-        hideDialog: function(){
-            var removed = new Array(),
-                dialogs = this.e.container.querySelectorAll(".tail-writer-dialog");
-            if(dialogs.length > 0){
-                for(var i = 0; i < dialogs.length; i++){
-                    removed.push(dialogs[i].getAttribute("data-writer-dialog"));
-
-                    if(this.con.animate){
-                        tail.animate(dialogs[i], function(element){
-                            if(parseFloat(element.style.opacity) > 0.0){
-                                element.style.opacity = parseFloat(element.style.opacity) - 0.1;
-                                return true;
-                            }
-                            element.parentElement.removeChild(element);
-                            return false;
-                        }, 10, true);
-                    } else {
-                        dialogs[i].parentElement.removeChild(dialogs[i]);
-                    }
-                }
+                return true;
             }
 
-            // Mask
-            var mask = this.e.container.querySelector(".tail-writer-mask");
-            if(mask && this.con.animate){
-                tail.animate(this.e.container.querySelector(".tail-writer-mask"), function(element){
-                    if(parseFloat(element.style.opacity) > 0.0){
-                        element.style.opacity = parseFloat(element.style.opacity) - 0.1;
-                        return true;
-                    }
-                    element.parentElement.removeChild(element);
+            // On Input
+            if(event.type == "input"){
+                this.val = this.e.editor.value;
+            }
+
+            // On Key
+            if(["keydown", "keyup", "keypress"].indexOf(event.type) >= 0){
+                var alt = event.altKey, ctrl = event.ctrlKey, shift = event.shiftKey;
+                var key = event.which || event.keyCode,
+                    com = 0 + (shift? 16: 0) + (ctrl? 17: 0) + (alt? 18: 0);
+
+                if(!(event.type + "-" + key in this.keys)){
                     return false;
-                }, 10, true);
-            } else {
-                mask.parentElement.removeChild(mask);
-            }
-            return removed;
-        },
-
-        /*
-         |  CORE :: REMOVE TAIL.WRITER
-         |  @since  0.2.0
-         |  @update 0.3.0
-         */
-        remove: function(){
-            this.e.container.removeChild(this.e.toolbar);
-            this.e.container.removeChild(this.e.statusbar);
-
-            var textarea = this.e.container.querySelector("textarea");
-            textarea.removeAttribute("data-writer-editor");
-            tail.removeClass(textarea, "tail-writer-editor");
-
-            this.e.container.parentElement.replaceChild(textarea, this.e.container);
-            return true;
-        },
-
-        /*
-         |  ACTION :: PERFORM TOOLBAR ACTION
-         |  @since  0.2.0
-         |  @update 0.3.0
-         */
-        perform: function(type, args){
-            var action = _action(type, args);
-            if(action === false){
-                return false;
-            }
-
-            // Call Action
-            if(typeof(action.callback) == "function"){
-                action.callback.call(this, action.markup, action, type, args);
-            } else if(["inline", "block"].indexOf(action.callback) >= 0){
-                this["do_" + action.callback].call(this, action.markup, action, type, args);
-            }
-
-            // Set Walker
-            if(typeof(action.walker) !== "undefined" && action.walker){
-                this.walk = [type, args, (this.walk instanceof Array)? this.walk[2]++: 0];
+                }
+                var keys = this.keys[event.type + "-" + key];
+                return (com in keys)? keys[com].call(self, event): false;
             }
             return false;
         },
 
         /*
-         |  ACTION :: INLINE ACTIONs
-         |  @since  0.2.0
-         |  @update 0.3.0
+         |  INTERNAL :: WALKABLE CHECK
+         |  @version    0.4.0 [0.2.0]
          */
-        do_inline: function(markup, action, type){
-            var sel = this.selection(),
-                __1 = this.val.slice(0, sel.start),
-                __2 = this.val.slice(sel.start, sel.end),
-                __3 = this.val.slice(sel.end, this.val.length);
-
-            // Modify Content
-            if(sel.start !== sel.end && __2.indexOf("\n\n") > -1){
-                sel.start = __1.length;
-                sel.end = __1.length + ((markup.length-2) * ((__2.match(/\n\n/g) || []).length+1)) + __2.length;
-
-                __2 = __2.split("\n\n"); __2.forEach(function(string, i){
-                    __2[i] = markup.replace("$1", __2[i]);
-                });
-                __2 = _filter(action, __1, __2.join("\n\n"), __3, sel);
-            } else {
-                sel.start = __1.length + markup.indexOf("$1");
-                sel.end = __1.length + markup.indexOf("$1") + __2.length;
-                __2 = _filter(action, __1, markup.replace("$1", __2), __3, sel);
+        walkable: function(string){
+            if(string.length == 0){
+                return false;
             }
-            this.write(__1 + __2 + __3, sel);
+
+            // Loop Walkers
+            var walk = false,
+                markups = writer.markups[this.con.markup],
+                walkers = this.markup.walkers, actions = this.markup.actions;
+            for(var key in walkers){
+                if(typeof(walkers[key]) === "function"){
+                    if((walk = walkers[key].call(this, string, actions[key])) !== false){
+                        break;
+                    }
+                } else {
+                    var markup = this.indentation("convert", walkers[key], true);
+                    if(string.indexOf(markup) >= 0){
+                        if(string.length > markup.length){
+                            walk = key;
+                        } else {
+                            this.currentLine("");
+                        }
+                        break;
+                    }
+                }
+            }
+            return walk;
         },
 
         /*
-         |  ACTION :: BLOCK ACTIONs
-         |  @since  0.2.0
-         |  @update 0.3.0
+         |  INTERNAL :: ERROR HANDLER
+         |  @version    0.4.0 [0.4.0]
          */
-        do_block: function(markup, action, type){
+        error: function(string){
+            if(this.con.debug){
+                console.error("tail.writer Error: " + this.translate(string));
+            }
+        },
+
+
+        /*
+         |  HELPER :: TRANSLATE
+         |  @version:   0.4.0 [0.4.0]
+         |
+         |  @param  string  The respective key to translate.
+         |
+         |  @return string  The translated string on success, the passed string otherwise.
+         */
+        translate: function(){
+            if(arguments.lengt == 0){
+                return "";
+            }
+            var string = arguments[0];
+                string = (string in this.__)? this.__[string]: string;
+
+            // Replace Artefacts
+            for(var i = 1; i < arguments.length; i++){
+                string = string.replace("$" + i, arguments[i]);
+            }
+            return string;
+        },
+
+        /*
+         |  HELPER :: GET / SET SELECTION
+         |  @version    0.4.0 [0.2.0]
+         |
+         |  @param  multi   The integer where the new selection should start, undefined to return the
+         |                  current selection. If start is negative, the made selection will start at
+         |                  the start'th character from the end of the content.
+         |  @param  multi   The integer where the new seleciton should end, undefined to just set the
+         |                  cursor to the respective position without to make a real selection. If end
+         |                  is negative the made selection will end until the start'th character +1,
+         |                  so use "-1" to select until the last character of the content.
+         |
+         |  @return object  Returns always a {start: int, end: int, lines: int} selection object.
+         */
+        selection: function(start, end){
+            if(typeof(start) === "undefined"){
+                var sel = {
+                    start: this.e.editor.selectionStart,
+                    end:   this.e.editor.selectionEnd
+                };
+                sel.lines = this.getContent(sel).split("\n").length-1;
+                return sel;
+            }
+
+            // Convert Object
+            if(typeof(start) === "object" && "start" in start){
+                end   = start.end || end || undefined;
+                start = start.start;
+            }
+
+            // Convert Numbers
+            start = isNaN(start)? this.val.length: start;
+            start = (start < 0)? this.val.length + start: start;
+            end   = (isNaN(end) || end === null)?  start: end;
+            end   = (end < 0)? this.val.length + end + 1: end;
+
+            // Handle Selection
+            this.e.editor.focus();
+            this.e.editor.selectionStart = start;
+            this.e.editor.selectionEnd = end;
+            return this.selection();
+        },
+
+        /*
+         |  HELPER :: INDENTATION
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  string  The respective action to apply:
+         |                      'indent'    Indent Content by one
+         |                      'outdent'   Outdent Content by one
+         |                      'convert'   Convert wrong Indentations into right ones (settings)
+         |                      'revert'    Convert right Indentions into wrong ones (settings)
+         |                      'count'     Just count the existing indention
+         |  @param  multi   The respective content as string, where the indentation helper should
+         |                  apply undefined to use the complete textarea value, or an selection
+         |                  array or object to apply it just on the respective part of the content.
+         |  @param  bool    TRUE to handle each indent, FALSE to just the starting ones.
+         |
+         |  @return multi   The intended or outdented new content or the count of the intentations.
+         */
+        indentation: function(action, content, entire){
+            if(typeof(content) === "undefined"){
+                content = this.val;
+            }
+            var right = (this.con.indentTab)? "tab": "space",
+                wrong = (this.con.indentTab)? "space": "tab",
+                space = (this.con.indentSize % 2 === 1)? this.con.indentSize++: this.con.indentSize,
+                maine = {"tab": "\\t", "space": (new Array(space + 1)).join(" ")},
+                replace = function(string, from, to){
+                    var regexp = (entire)? new RegExp(maine[from], "gm"): new RegExp("^" + maine[from], "gm");
+                    return string.replace(regexp, (to == "tab"? "\t": maine[to]));
+                };
+
+            // Handle Action
+            switch(action){
+                case "indent":
+                    content = content.split("\n").map(function(string){
+                        return "\t" + string;
+                    }).join("\n");
+                    break;
+                case "outdent":
+                    content = content.split("\n").map(function(string){
+                        return string.replace((new RegExp("^(\\t|" + maine["space"] + ")")), "");
+                    }).join("\n");
+                    break;
+                case "convert":     //@fallthrough
+                case "revert":
+                    if((action == "convert" && this.con.indentTab) || (action == "revert" && !this.con.indentTab)){
+                        content = replace(content, "space", "tab");
+                    } else {
+                        content = replace(content, "tab", "space");
+                    }
+                    break;
+                case "count":
+                    entire = true;
+                    content = replace(content, "space", "tab");
+                    content = (content.match(/\t/g) || []).length;
+                    break;
+            }
+            return content
+        },
+
+        /*
+         |  HELPER :: INDENTER
+         |  @version    0.4.0 [0.2.0]
+         |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
+         */
+        indenter: function(string, action){
+            this.error("The `indent()` function is deprecated, please use `indentation()` instead!", true);
+            if(action === "count"){
+                return this.indentation("count", string);
+            } else if(action === "create"){
+                return this.indentation("indent", string);
+            }
+            return this.indentation("convert", string);
+        },
+
+
+        /*
+         |  CONTENT :: GET CONTENT
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  multi   Use undefined to get the complete content or a valid cursor position
+         |                  (can also be negative). You can also pass null for the current selection
+         |                  or a valid selection object ([start, end] or {start: int, end: int}).
+         |
+         |  @return string  The respective content of the passed area, or an empty string.
+         */
+        getContent: function(area){
+            this.val = this.e.editor.value;
+
+            // Complete Content
+            if(typeof(area) === "undefined"){
+                return this.val;
+            }
+
+            // Integer
+            if(!isNaN(area)){
+                return this.val.substr((area < 0)? this.val.length + area: area);
+            }
+
+            // Selection
+            if(area === null){
+                area = this.selection();
+            }
+            if(!((area.length && area.length == 2) || ("start" in area && "end" in area))){
+                return "";
+            }
+            return this.val.substring(
+                ("start" in area)? area.start: area[0],
+                ("end" in area)? area.end: area[1]
+            );
+        },
+
+        /*
+         |  CONTENT :: READ CONTENT PER LINE
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  string  The line number where you want to start reading. Use 0 to start with
+         |                  the first line. You can also pass a negative integer.
+         |  @param  string  The line number where you want to stop reading. Don't pass any number
+         |                  to read until the end. You can also pass a negative integer.
+         |
+         |  @return string  The respective content.
+         */
+        readContent: function(start, end){
+            if(typeof(start) === "undefined" || (start === 0 && typeof(end) === "undefined")){
+                return this.getContent();
+            }
+            var content = this.getContent().split("\n");
+
+            // Calc Start
+            if(start < 0){
+                start = content.length + start;
+            }
+            if(typeof(end) == "undefined" || end < start){
+                end = content.length;
+            }
+            return content.slice(start, end).join("\n");
+        },
+
+        /*
+         |  CONTENT :: READ
+         |  @version    0.4.0 [0.2.0]
+         |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
+         */
+        read: function(){
+            this.error("The `read()` function is deprecated, please use `getContent()` or `readContent()` instead!", true);
+            return this.getContent();
+        },
+
+        /*
+         |  CONTENT :: SPLIT CONTENT
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  multi   Use undefined to affect the complete content or a valid cursor position
+         |                  (can also be negative). You can also pass null for the current selection
+         |                  or a valid selection object ([start, end] or {start: int, end: int}).
+         |
+         |  @return multi   An array with 3 elements [start, select, end], or FALSE on failure.
+         */
+        splitContent: function(area){
+            var content = this.getContent();
+            if(area === null){
+                area = this.selection();
+            }
+
+            // Select
+            if(typeof(area) === "undefined"){
+                return ["", content, ""];
+            } else if(!isNaN(area)){
+                return [content.slice(0, area), content.slice(area), ""];
+            } else if("start" in area && "end" in area){
+                return [
+                    content.slice(0, area.start),
+                    content.slice(area.start, area.end),
+                    content.slice(area.end)
+                ];
+            } else if(area.length && area.length == 2){
+                return [
+                    content.slice(0, area[0]),
+                    content.slice(area[0], area[1]),
+                    content.slice(area[1])
+                ];
+            }
+            return false;
+        },
+
+        /*
+         |  CONTENT :: SET CONTENT
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  string  The new content, which should be written.
+         |  @param  string  The handler, where the new content should be placed.
+         |                      'replace'   Replaces the complete content with the new one, pass
+         |                                  an content area to restrict the replacement.
+         |                      'append'    Append the new content on the end of the existing one
+         |                                  or on the end of the area if passed.
+         |                      'prepend'   Prepend the new content on the start of the existing one
+         |                                  or on the start of the area if passed.
+         |  @param  multi   Use undefined to affect the complete content or a valid cursor position
+         |                  (can also be negative). You can also pass null for the current selection
+         |                  or a valid selection object ([start, end] or {start: int, end: int}).
+         |  @param  multi   The new selection, which should be made after the content has been
+         |                  replaced. Can be an [int, int] or an {start: int, end: int} object.
+         |
+         |  @return multi   The new content as string. FALSE on failure.
+         */
+        setContent: function(content, handle, area, selection){
+            var section = this.splitContent(area), sel = this.selection();
+            if(!section){
+                return false;
+            }
+            var count = section.join("").length;
+
+            // Affect new Content
+            switch(handle){
+                case "append":      // <old>.<new>
+                    content = this.indentation("convert", content);
+
+                    if(selection === null){
+                        sel.start += content.length;
+                        sel.end += content.length;
+                    }
+                    section[1] = section[1] + content;
+                    break;
+                case "prepend":     // <new>.<old>
+                    content = this.indentation("convert", content);
+
+                    if(selection === null){
+                        sel.start += content.length;
+                        sel.end += content.length;
+                    }
+                    section[1] = content + section[1];
+                    break;
+                default:            //    <new>
+                    content = this.indentation("convert", content);
+
+                    if(selection === null){
+                        sel.end = sel.end - section[1].length + content.length;
+                    }
+                    section[1] = content;
+                    break;
+            }
+
+            // Inject new Content
+            this.e.editor.value = this.val = this.indentation("convert", section.join(""));
+
+            // Return
+            if(typeof(selection) !== "undefined"){
+                if(selection === null){
+                    selection = sel;
+                }
+                this.selection(selection);
+            }
+            this.resize(false);
+            return this.val;
+        },
+
+        /*
+         |  CONTENT :: WRITE CONTENT (HELPER FOR `.setContent()`)
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  string  The new content, which should be written.
+         |  @param  multi   The new selection, which should be made after the content has been
+         |                  replaced. Can be an [int, int] or an {start: int, end: int} object.
+         |
+         |  @return string  The new content as string. FALSE on failure.
+         */
+        writeContent: function(content, selection){
+            var sel = this.selection();
+            if(sel.start !== sel.end){
+                return this.setContent(content, "replace", sel, selection);
+            }
+            return this.setContent(content, "append", sel, selection);
+        },
+
+        /*
+         |  CONTENT :: WRITE
+         |  @version    0.4.0 [0.2.0]
+         |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
+         */
+        write: function(content, selection){
+            this.error("The `write()` function is deprecated, please use `setContent()` or `writeContent()` instead!", true);
+            return this.setContent(content, "replace", undefined, selection);
+        },
+
+        /*
+         |  CONTENT :: GET / SET PREVIOUS LINE
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  multi   Use `undefined` to return the previous line, depending on the cursor
+         |                  position. Pass a line to replace it.
+         |
+         |  @return multi   The (changed) previous line on success, FALSE otherwise.
+         */
+        previousLine: function(content){
             var sel = this.selection(),
-                __1 = this.val.slice(0, sel.start),
-                __2 = this.val.slice(sel.start, sel.end),
-                __3 = this.val.slice(sel.end, this.val.length);
+                prev = this.val.slice(0, sel.start).split("\n");
+                prev.pop();
+
+            if(typeof(content) === "string"){
+                if(prev.length > 0){
+                    var area = prev.pop().length, length = prev.join("\n").length;
+                    this.setContent(content, "replace", [length, area + length], null);
+                } else {
+                    this.setContent(content + "\n", "prepend", null);
+                }
+                return content;
+            }
+            return (prev.length > 0)? prev.pop(): false;
+        },
+
+        /*
+         |  CONTENT :: CURRENT LINE
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  multi   Use `undefined` to return the current line, depending on the cursor
+         |                  position. Pass a line to replace it.
+         |
+         |  @return multi   The (changed) current line on success, FALSE otherwise.
+         */
+        currentLine: function(content){
+            var sel = this.selection(),
+                prev = this.val.slice(0, sel.start).split("\n"),
+                next = this.val.slice(sel.start).split("\n"),
+                curr = prev.pop() + next.shift();
+
+            if(typeof(content) === "string"){
+                var area = prev.join("\n").length + (prev.length? 1: 0);
+                this.setContent(content, "replace", [area, area + curr.length], null);
+                return content;
+            }
+            return curr;
+        },
+
+        /*
+         |  CONTENT :: NEXT LINE
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  multi   Use `undefined` to return the nextline, depending on the cursor
+         |                  position. Pass a line to replace it.
+         |
+         |  @return multi   The (changed) next line on success, FALSE otherwise.
+         */
+        nextLine: function(content){
+            var sel = this.selection(),
+                next = this.val.slice(sel.start).split("\n"),
+                area = sel.start - next.shift().length + 1;
+
+            if(typeof(content) === "string"){
+                if(next.length > 0){
+                    this.setContent(content, "replace", [area, area + next.shift().length], null);
+                } else {
+                    this.setContent("\n" + content, "append", null);
+                }
+                return content;
+            }
+            return (next.length > 0)? next.shift(): false;
+        },
+
+
+        /*
+         |  HANDLE :: RESIZE EDITOR EIGHT
+         |  @version    0.4.0 [0.2.0]
+         */
+        resize: function(scroll){
+            if(!this.con.resize){
+                return false;
+            }
+            var css = "height:auto;min-height:none;max-height:none;opacity:0;position:absolute;";
+
+            // Clone Textarea
+            var calc = this.e.editor.cloneNode();
+                calc.style.cssText = css;
+
+            // Calculate Height
+            this.e.main.insertBefore(calc, this.e.editor);
+            var height = calc.scrollHeight + "px";
+            if(parseInt(this.e.editor.style.minHeight, 10) > calc.scrollHeight){
+                height = this.e.editor.style.minHeight;
+            } else if(parseInt(this.e.editor.style.maxHeight, 10) < calc.scrollHeight){
+                height = this.e.editor.style.maxHeight;
+            }
+
+            // Set Height
+            this.e.editor.style.height = (parseInt(height, 10) + 2) + "px";
+            this.e.main.removeChild(calc);
+            return this;
+        },
+
+        /*
+         |  HANDLE :: TOOLTIPS
+         |  @version    0.4.0 [0.2.0]
+         */
+        tooltip: function(event, element){
+            if(cHAS(this.e.main, "disabled") || cHAS(this.e.main, "readonly")){
+                return false;
+            } else if(cHAS(event.target, "disabled") || this.con.tooltip === false){
+                return false;
+            }
+            if(typeof(this.con.tooltip) === "function"){
+                return this.con.tooltip.call(this, event, element);
+            }
+            var id = element.getAttribute("data-writer-action").replace(/[^a-z_-]/g, "-"), tip;
+
+            // Show Tooltip
+            if(event.type === "mouseover"){
+                var tip = d.createElement("DIV"), pos = position(element);
+
+                if(!this.e.main.querySelector("#tooltip-" + id)){
+                    tip.id = "tooltip-" + id;
+                    tip.innerHTML = element.getAttribute("data-writer-tooltip");
+                    tip.className = "tail-writer-tooltip tooltip-position-" + this.con.tooltip;
+                    this.e.main.appendChild(tip);
+
+                    switch(this.con.tooltip){
+                        case "left":
+                            tip.style.top = (pos.top + (pos.height/2) - (tip.offsetHeight/2)) + "px";
+                            tip.style.left = (pos.left - tip.offsetWidth - 10) + "px";
+                            break;
+                        case "right":
+                            tip.style.top = (pos.top + (pos.height/2) - (tip.offsetHeight/2)) + "px";
+                            tip.style.left = (pos.left + pos.width + 10) + "px";
+                            break;
+                        case "bottom":
+                            tip.style.top = (pos.top + pos.height + 10) + "px";
+                            tip.style.left = (pos.left + (pos.width / 2) - (tip.offsetWidth / 2)) + "px";
+                            break;
+                        default:
+                            tip.style.top = (pos.top - tip.offsetHeight - 10) + "px";
+                            tip.style.left = (pos.left + (pos.width / 2) - (tip.offsetWidth / 2)) + "px";
+                            break;
+                    }
+
+                    // Fix on Fullwidth
+                    if(this.e.tools.offsetLeft > 1){
+                        tip.style.top = (parseInt(tip.style.top) + this.e.tools.offsetTop) + "px";
+                        tip.style.left = (parseInt(tip.style.left) + this.e.tools.offsetLeft) + "px";
+                    }
+
+                    // Fix on Scrollable
+                    var inner = this.e.tools.querySelector(".toolbar-inner");
+                    if(inner && inner.scrollLeft > 0){
+                        tip.style.left = (parseInt(tip.style.left) - inner.scrollLeft) + "px";
+                    }
+                }
+                (function(tid){
+                    setTimeout(function(){
+                        if(d.querySelector("#" + tid)){ cADD(d.querySelector("#" + tid), "show"); }
+                    }, 350);
+                }("tooltip-" + id));
+                return true;
+            }
+
+            // Hide Tooltip
+            if(!(tip = this.e.main.querySelector("#tooltip-" + id))){
+                return false;
+            }
+            if(cHAS(tip, "show")){
+                cREM(tip, "show");
+                return (function(e){
+                    setTimeout(function(){
+                        if(e && e.parentElement){ e.parentElement.removeChild(e); }
+                    }, 200);
+                })(tip);
+            }
+            return (tip && tip.parentElement)? tip.parentElement.removeChild(tip): undefined;
+        },
+
+        /*
+         |  HANDLE :: UPDATE WRITER
+         |  @version    0.4.0 [0.4.0]
+         */
+        update: function(){
+            writer.load.call(this, "update");
+            return this.statusbar();
+        },
+
+
+        /*
+         |  API :: PERFORM ACTION
+         |  @version    0.4.0 [0.2.0]
+         */
+        perform: function(id, args){
+            if(cHAS(this.e.main, "disabled") || cHAS(this.e.main, "readonly")){
+                this.walker = false;
+                return;
+            }
+
+            // Get Action
+            var action = this.markup.get(id, args);
+            if(action === false){
+                return this.error("errorAction");
+            }
+            if(typeof(action.markup) === "string"){
+                action.markup = this.indentation("convert", action.markup, true);
+            }
+
+            // Call Action
+            if(typeof(action.action) == "function"){
+                action.action.call(this, action.markup, action, action.id, action.params);
+            } else if(["inline", "block"].indexOf(action.action) >= 0){
+                this["do_" + action.action].call(this, action.markup, action, action.params);
+            }
+
+            // Set Walker
+            this.walker = false;
+            return true;
+        },
+
+        /*
+         |  API :: GENERAL INLINE ACTION
+         |  @version    0.4.0 [0.2.0]
+         */
+        do_inline: function(markup, action, args, map){
+            var sel = this.selection(), val = this.splitContent(sel);
 
             // Modify Content
-            if(sel.start !== sel.end){
-                var self = this;
-                __2 = __2.replace(/[^|\n]([^\n]+)/g, function(string){
-                    return self.indenter(markup.replace("$1", string), "create");
-                });
-                __2 = _filter(action, __1, __2, __3, sel);
+            val[1] = val[1].split("\n").map(map || function(value){
+                return markup.replace("$1", value);
+            }).join("\n");
+
+            // Change Selection
+            if(sel.start === sel.end){
+                sel.end = sel.start += markup.indexOf("$1");
             } else {
-                if(__1.length > 0 && __1.length > __1.lastIndexOf("\n")+1){
-                    __1 += "\n";
+                sel.end = sel.start + val[1].length;
+            }
+
+            // Change Content
+            var content = this.markup.filter(action.id, val[0], val[1], val[2], sel);
+            return this.writeContent(content, sel);
+        },
+
+        /*
+         |  API :: GENERAL BLOCK ACTION
+         |  @version    0.4.0 [0.2.0]
+         */
+        do_block: function(markup, action, args, map){
+            var sel = this.selection(), val = this.splitContent(sel);
+
+            // Modify Content
+            if(action.walker){
+                val[1] = val[1].split("\n").map(map || function(value){
+                    return markup.replace("$1", value);
+                }).join("\n");
+            } else {
+                val[1] = markup.replace("$1", val[1]);
+            }
+
+            // Change Selection
+            if(sel.start === sel.end){
+                sel.start = sel.end = sel.start + markup.indexOf("$1");
+            } else {
+                sel.end = sel.start  = val[0].length + val[1].length;
+                sel.end = sel.start += (!action.walker)? -markup.indexOf("$1"): 0;
+            }
+
+            // Change Content
+            var content = this.markup.filter(action.id, val[0], val[1], val[2], sel);
+            return this.writeContent(content, sel);
+        },
+
+        /*
+         |  API :: SHOW ELEMENT
+         |  @version    0.4.0 [0.4.0]
+         */
+        showElement: function(type, id, inner, callback){
+            if(cHAS(this.e.main, "disabled") || cHAS(this.e.main, "readonly")){
+                return;
+            }
+            if(this.e.main.querySelector("#" + type + "-" + id)){
+                return this.hideElement(type, id);
+            }
+            this.hideElement(type);
+
+            // Create Element
+            var element = create("DIV", "tail-writer-" + type + " tail-writer-" + type + "-" + id);
+                element.id = type + "-" + id;
+            if(inner instanceof Element){
+                element.appendChild(inner);
+            } else {
+                element.innerHTML = inner;
+            }
+            this.e.main.appendChild(element);
+
+            // Format Element
+            if(type == "dropdown"){
+                var btn = this.e.tools.querySelector(".action-" + id);
+                element.style.top = btn.offsetTop + btn.offsetHeight + "px";
+                element.style.left = btn.offsetLeft + "px";
+            } else if(type == "dialog"){
+                element.style.top = "50%";
+                element.style.left = "50%";
+                element.style.marginTop = "-" + (element.offsetHeight / 2) + "px";
+                element.style.marginLeft = "-" + (element.offsetWidth / 2) + "px";
+            }
+
+            // Plugin API
+            element = writer.load.call(this, "showElement", [element, type, id, inner, callback]);
+            if(!(element instanceof Element)){
+                return false;
+            }
+
+            // Hook Element
+            (function(cb, self){
+                if(!element.querySelector(".dropdown-form,.dialog-form")){
+                    return false;
                 }
-                __2 = this.indenter(markup.replace("$1", ""), "create");
-                sel.start = sel.end = __1.length + __2.length;
-                __2 = _filter(action, __1, __2, __3, sel);
-            }
-            this.write(__1 + __2 + __3, sel);
-        }
-    }
-
-    // Assign to jQuery
-    if(typeof(jQuery) !== "undefined"){
-        jQuery.fn.extend({
-            tailWriter: function(options){
-                return this.each(function(){
-                    return new tailWriter(this, options);
+                var el = element.querySelector(".dropdown-form,.dialog-form");
+                el.addEventListener("click", function(event){
+                    if(event.target.hasAttribute("data-value")){
+                        event.preventDefault();
+                        cb.call(self, event, el);
+                    }
                 });
-            }
-        });
-    }
+            }(callback, this));
 
-    // Assign to MooTools
-    if(typeof(d.id) !== "undefined"){
-        Element.implement({
-            tailWriter: function(options){
-                return new tailWriter(this, options);
-            }
-        });
-    }
+            // Animate
+            cADD(element, "show");
+            return true;
+        },
 
-    // Assign to Window
-    if(typeof(w.tail) == "undefined"){
-        w.tail = {};
-    }
-    w.tail.writer = tailWriter;
-    return w.tail.writer;
-})(this);
+        /*
+         |  API :: SHOW DIALOG
+         |  @version    0.4.0 [0.2.0]
+         |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
+         */
+        showDialog: function(_1, _2, _3){
+            this.error("The `showDialog()` function is deprecated, please use `showElement()` instead!", true);
+            return this.showElement("dialog", _1, _2, _3);
+        },
+
+        /*
+         |  API :: SHOW DROPDOWN
+         |  @version    0.4.0 [0.2.0]
+         |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
+         */
+        showDropdown: function(_1, _2, _3){
+            this.error("The `showDropdown()` function is deprecated, please use `showElement()` instead!", true);
+            return this.showElement("dropdown", _1, _2, _3);
+        },
+
+        /*
+         |  API :: HIDE ELEMENT
+         |  @version    0.4.0 [0.4.0]
+         */
+        hideElement: function(type, id){
+            if(id === undefined){
+                var elements = this.e.main.querySelectorAll(".tail-writer-" + type);
+            } else {
+                var elements = this.e.main.querySelectorAll(".tail-writer-" + type + "-" + id);
+            }
+
+            // Plugin API
+            elements = writer.load.call(this, "hideElement", [elements, type, id]);
+            if(!elements.length || elements.length && elements.length == 0){
+                return false;
+            }
+
+            // Remove
+            for(var l = elements.length, i = 0; i < l; i++){
+                cREM(elements[i], "show");
+                (function(e){
+                    setTimeout(function(){
+                        if(e && e.parentElement){ e.parentElement.removeChild(e); }
+                    }, 200);
+                })(elements[i]);
+            }
+            return true;
+        },
+
+        /*
+         |  API :: HIDE DIALOG
+         |  @version    0.4.0 [0.2.0]
+         |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
+         */
+        hideDialog: function(){
+            this.error("The `hideDialog()` function is deprecated, please use `hideElement()` instead!", true);
+            return this.hideElement("dialog");
+        },
+
+        /*
+         |  API :: HIDE DROPDOWN
+         |  @version    0.4.0 [0.2.0]
+         |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
+         */
+        hideDropdown: function(){
+            this.error("The `hideDropdown()` function is deprecated, please use `hideElement()` instead!", true);
+            return this.hideElement("dropdown");
+        },
+
+
+        /*
+         |  PUBLIC :: EVENT LISTENER
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  string  The respective event listener name. The core ones are:
+         |                  'input'             Triggers when the content gets changed
+         |                  'action'            Triggers when an action button gets pressed
+         |                  'status'            Triggers when the statusbar gets updated
+         |                  'click'             Triggers when the user clicks on the element.
+         |                  'keydown'           Triggers when the user press a key.
+         |                  'keyup'             Triggers when the user release a key.
+         |                  'keypress'          Triggers when the user press+release a key.
+         |                  'dialog:open'       Triggers when a dialog gets opened
+         |                  'dropdown:open'     Triggers when a dropdown gets opened
+         |                  'dialog:close'      Triggers when a dialog gets closed
+         |                  'dropdown:close'    Triggers when a dropdown gets closed
+         |  @param  callb.  A custom callback function.
+         |  @param  array   An array with own arguments, which should pass to the callback too.
+         |
+         |  @return bool    TRUE if everything is fluffy, FALSE if not.
+         */
+        on: function(event, callback, args){
+            if(typeof(event) !== "string" || typeof(callback) !== "function"){
+                return false;
+            }
+            if(!(event in this.events)){
+                this.events[event] = [];
+            }
+            this.events[event].push({cb: callback, args: (args instanceof Array)? args: []});
+            return true;
+        },
+
+        /*
+         |  PUBLIC :: BIND KEY / COMBINATION
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  int     The respective event keyCode (not the key name!).
+         |  @param  callb.  The callback function.
+         |  @param  bool    TRUE if SHIFT need to be pressed too.
+         |  @param  bool    TRUE if CTRL need to be pressed too.
+         |  @param  bool    TRUE if ALT need to be pressed too.
+         |  @param  string  The respective event type (keydown, keypress or keyup)
+         |
+         |  @return bool    TRUE if everything is fluffy, FALSE if not.
+         */
+        bind: function(keyCode, callback, shift, ctrl, alt, type){
+            type = typeof(type) != "string"? "keydown": type;
+            if(["keydown", "keypress", "keyup"].indexOf(type) < 0){
+                return false;
+            }
+
+            // Check Key
+            if(typeof(keyCode) != "number" || typeof(callback) != "function"){
+                return false;
+            }
+            var com = 0 + (shift? 16: 0) + (ctrl? 17: 0) + (alt? 18: 0);
+
+            // Add Key
+            if(!(type + "-" + keyCode in this.keys)){
+                this.keys[type + "-" + keyCode] = {};
+            }
+            this.keys[type + "-" + keyCode][com.toString()] = callback;
+            return false;
+        },
+
+        /*
+         |  PUBLIC :: GET | SET CONFIGURATION
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  multi   Use undefined to return the complete config object, use the single key to
+         |                  return or set the respective value of this option or pass an object with
+         |                  multiple key => value pairs to set multiple values at once.
+         |  @param  multi   Set a new value to the respective option passed in `key`.
+         |  @param  bool    TRUE to call reload (if you set one or more options), FALSE otherwise.
+         |
+         |  @return multi   The option object (on undefined), the respective value (if the key is
+         |                  defined) or the prototype instance otherwise.
+         */
+        config: function(key, value, rebuild){
+            if(typeof(key) == "undefined"){
+                return this.con;
+            }
+
+            // Multiple
+            if(key instanceof Object){
+                for(var k in key){ this.con[k] = key[k]; }
+                return (rebuild)? this.reload: this;
+            }
+
+            // Single
+            if(typeof(value) == "undefined"){
+                return (key in this.con)? this.con[key]: undefined;
+            }
+            this.con[key] = value;
+            return (rebuild)? this.reload(): this;
+        },
+
+        /*
+         |  PUBLIC :: DISABLE INSTANCE AND EDITOR
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @return multi   The option object (on undefined), the respective value (if the key is
+         |                  defined) or the prototype instance otherwise.
+         */
+        disable: function(){
+            this.e.editor.disabled = (!state)? false: true;
+            return this.config("disabled", true, true);
+        },
+
+        /*
+         |  PUBLIC :: ENABLE INSTANCE AND EDITOR
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @return multi   The option object (on undefined), the respective value (if the key is
+         |                  defined) or the prototype instance otherwise.
+         */
+        enable: function(){
+            this.e.editor.disabled = false;
+            return this.config("disabled", false, true);
+        },
+
+        /*
+         |  PUBLIC :: SET INTO READONLY MODE
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @param  bool    TRUE to enable readonly, FALSE to disable.
+         |
+         |  @return multi   The option object (on undefined), the respective value (if the key is
+         |                  defined) or the prototype instance otherwise.
+         */
+        readonly: function(state){
+            this.e.editor.readOnly = (!state)? false: true;
+            return this.config("readonly", (!state)? false: true, true);
+        },
+
+        /*
+         |  PUBLIC :: REMOVE WRITER
+         |  @version    0.4.0 [0.2.0]
+         |
+         |  @return this    The prototype instance.
+         */
+        remove: function(){
+            this.e.main.removeChild(this.e.tools);
+            this.e.main.removeChild(this.e.status);
+
+            var textarea = this.e.main.querySelector("textarea");
+            textarea.removeAttribute("data-tail-writer");
+            cREM(textarea, "tail-writer-editor");
+
+            this.e.main.parentElement.replaceChild(textarea, this.e.main);
+            writer.load.call(this, "remove");
+            return this;
+        },
+
+        /*
+         |  PUBLIC :: RELOAD WRITER
+         |  @version    0.4.0 [0.4.0]
+         |
+         |  @return this    The prototype instance.
+         */
+        reload: function(){
+            return this.remove().init();
+        }
+    };
+
+    // Return to Factory
+    return writer;
+}));

@@ -1,0 +1,402 @@
+//
+//  tail.writer.demo - The official demonstration page for our tail.writer script!
+//  @file       ./less/tail.utilities.less
+//  @author     SamBrishes <sam@pytes.net>
+//  @version    0.4.0 [0.4.0] - Alpha
+//
+//  @website    https://github.com/pytesNET/tail.writer
+//  @license    X11 / MIT License
+//  @copyright  Copyright © 2015 - 2019 SamBrishes, pytesNET <info@pytes.net>
+//
+
+/* @start SPECIAL BUTTON */
+.special-button{
+    color: @white;
+    margin: 0 auto;
+    padding: 17px 30px 15px 30px;
+    display: inline-block;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 38px;
+    font-family: @font-header;
+    background-color: @primary;
+    .radius(3px;);
+}
+/* @end SPECIAL BUTTON */
+
+
+/* @start GRIDs */
+.row{
+    margin: 15px 0;
+    display: block;
+}
+.grid{
+	clear: both;
+    margin: 0px;
+	padding: 0px;
+
+    &:before, &:after{
+        &:extend(.clearfix);
+    }
+    *[class*="cell"]{
+        float: left;
+        margin: 0;
+        padding: 0;
+        display: block;
+
+        &:last-child{
+            border-right-width: 1px;
+        }
+    }
+    .cell-12{   width: 100%;    }
+    .cell-11{   width: 91.66%;  }
+    .cell-10{   width: 83.33%;  }
+    .cell-9 {   width: 75%;     }
+    .cell-8 {   width: 66.66%;  }
+    .cell-7 {   width: 58.33%;  }
+    .cell-6 {   width: 50%;     }
+    .cell-5 {   width: 41.66%;  }
+    .cell-4 {   width: 33.33%;  }
+    .cell-3 {   width: 25%;     }
+    .cell-2 {   width: 16.66%;  }
+    .cell-1 {   width: 8.333%;  }
+    .cell-space-12{   margin-left: 100%;    }
+    .cell-space-11{   margin-left: 91.66%;  }
+    .cell-space-10{   margin-left: 83.33%;  }
+    .cell-space-9 {   margin-left: 75%;     }
+    .cell-space-8 {   margin-left: 66.66%;  }
+    .cell-space-7 {   margin-left: 58.33%;  }
+    .cell-space-6 {   margin-left: 50%;     }
+    .cell-space-5 {   margin-left: 41.66%;  }
+    .cell-space-4 {   margin-left: 33.33%;  }
+    .cell-space-3 {   margin-left: 25%;     }
+    .cell-space-2 {   margin-left: 16.66%;  }
+    .cell-space-1 {   margin-left: 8.333%;  }
+
+    .row{
+        width: 100%;
+        display: block;
+
+        &:before, &:after{
+            &:extend(.clearfix);
+        }
+        *[class*="cell"]{
+            border-bottom-width: 0;
+
+            &:last-child{
+                border-right-width: 1px;
+            }
+        }
+        &:last-child *[class*="cell"]{
+            border-bottom-width: 1px;
+        }
+    }
+}
+.split{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: table;
+    border-spacing: 0;
+    border-collapse: collase;
+
+    & > *{
+        width: 0%;
+        margin: 0;
+        padding: 0;
+        display: none;
+        vertical-align: top;
+    }
+    & > div{
+        width: auto;
+        display: table-cell;
+        vertical-align: top;
+    }
+    &.asides{
+        & > *{
+            display: none;
+        }
+        & > *:first-child, & > *:last-child{
+            width: 50%;
+            padding: 15px;
+            display: table-cell;
+        }
+    }
+    &.separated > *:first-child{
+        .border(0 1px 0 0; solid; @light-2);
+    }
+}
+/* @end GRIDS */
+
+/* @start TOOLTIPs */
+*[data-tooltip]{
+   cursor: pointer;
+}
+.tooltip{
+    width: auto;
+    margin: 0;
+    padding: 10px 15px;
+    opacity: 1.0;
+    z-index: 999;
+    display: inline-block;
+    opacity: 0;
+    position: absolute;
+    font-size: 12px;
+    line-height: 1.25;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+
+    &.show{
+        opacity: 1.0;
+    }
+    &:after{
+        width: 0;
+        height: 0;
+        content: "";
+        display: block;
+        position: absolute;
+    }
+
+    // Tooltip Positions
+    &.tooltip-top{
+        &:after{
+            top: 100%;
+            left: 50%;
+            margin: 0 0 0 -10px;
+            border-width: 10px 10px 0 10px;
+            border-style: solid;
+            border-color: @white transparent transparent transparent;
+        }
+    }
+    &.tooltip-left{
+        &:after{
+            top: 50%;
+            left: 100%;
+            margin: -10px 0 0 0;
+            border-width: 10px 0 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent transparent @white;
+        }
+    }
+    &.tooltip-right{
+        &:after{
+            top: 50%;
+            left: -10px;
+            margin: -10px 0 0 0;
+            border-width: 10px 10px 10px 0;
+            border-style: solid;
+            border-color: transparent @white transparent transparent;
+        }
+    }
+    &.tooltip-bottom{
+        &:after{
+            top: -10px;
+            left: 50%;
+            margin: 0 0 0 -10px;
+            border-width: 0 10px 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent @white transparent;
+        }
+    }
+
+    // Tooltip Colors
+    &.tooltip-red{
+        color: @white;
+        background-color: @red;
+
+        &.tooltip-top:after{
+            border-top-color: @red;
+        }
+        &.tooltip-left:after{
+            border-left-color: @red;
+        }
+        &.tooltip-right:after{
+            border-right-color: @red;
+        }
+        &.tooltip-bottom:after{
+            border-bottom-color: @red;
+        }
+    }
+    &.tooltip-orange{
+        color: @white;
+        background-color: @orange;
+
+        &.tooltip-top:after{
+            border-top-color: @orange;
+        }
+        &.tooltip-left:after{
+            border-left-color: @orange;
+        }
+        &.tooltip-right:after{
+            border-right-color: @orange;
+        }
+        &.tooltip-bottom:after{
+            border-bottom-color: @orange;
+        }
+    }
+    &.tooltip-green{
+        color: @white;
+        background-color: @green;
+
+        &.tooltip-top:after{
+            border-top-color: @green;
+        }
+        &.tooltip-left:after{
+            border-left-color: @green;
+        }
+        &.tooltip-right:after{
+            border-right-color: @green;
+        }
+        &.tooltip-bottom:after{
+            border-bottom-color: @green;
+        }
+    }
+    &.tooltip-blue{
+        color: @white;
+        background-color: @blue;
+
+        &.tooltip-top:after{
+            border-top-color: @blue;
+        }
+        &.tooltip-left:after{
+            border-left-color: @blue;
+        }
+        &.tooltip-right:after{
+            border-right-color: @blue;
+        }
+        &.tooltip-bottom:after{
+            border-bottom-color: @blue;
+        }
+    }
+    &.tooltip-violet{
+        color: @white;
+        background-color: @violet;
+
+        &.tooltip-top:after{
+            border-top-color: @violet;
+        }
+        &.tooltip-left:after{
+            border-left-color: @violet;
+        }
+        &.tooltip-right:after{
+            border-right-color: @violet;
+        }
+        &.tooltip-bottom:after{
+            border-bottom-color: @violet;
+        }
+    }
+    &.tooltip-black{
+        color: @white;
+        background-color: darken(@black, 7%);
+
+        &.tooltip-top:after{
+            border-top-color: darken(@black, 7%);
+        }
+        &.tooltip-left:after{
+            border-left-color: darken(@black, 7%);
+        }
+        &.tooltip-right:after{
+            border-right-color: darken(@black, 7%);
+        }
+        &.tooltip-bottom:after{
+            border-bottom-color: darken(@black, 7%);
+        }
+    }
+    &.tooltip-white{
+        color: @black;
+        background-color: darken(@white, 3%);
+
+        &.tooltip-top:after{
+            border-top-color: darken(@white, 3%);
+        }
+        &.tooltip-left:after{
+            border-left-color: darken(@white, 3%);
+        }
+        &.tooltip-right:after{
+            border-right-color: darken(@white, 3%);
+        }
+        &.tooltip-bottom:after{
+            border-bottom-color: darken(@white, 3%);
+        }
+    }
+
+    // Animation :: Blank
+    &.tooltip-blank{
+        opacity: 0;
+
+        &.show{
+            opacity: 1.0;
+        }
+    }
+
+    // Animation :: Fade
+    &.tooltip-fade{
+        opacity: 0;
+        transition: opacity 142ms linear;
+        -moz-transition: opacity 142ms linear;
+        -webkit-transition: opacity 142ms linear;
+
+        &.show{
+            opacity: 1.0;
+        }
+    }
+
+    // Animation :: Ease-In
+    &.tooltip-ease-in{
+        transition: margin 142ms linear, opacity 142ms linear;
+        -moz-transition: margin 142ms linear, opacity 142ms linear;
+        -webkit-transition: margin 142ms linear, opacity 142ms linear;
+
+        &.tooltip-top{
+            margin: -25px 0 0 0;
+        }
+        &.tooltip-left{
+            margin: 0 0 0 -25px;
+        }
+        &.tooltip-right{
+            margin: 0 0 0 25px;
+        }
+        &.tooltip-bottom{
+            margin: 25px 0 0 0;
+        }
+        &.tooltip-top.show,
+        &.tooltip-left.show,
+        &.tooltip-right.show,
+        &.tooltip-bottom.show{
+            margin: 0;
+        }
+    }
+
+    // Animation :: Ease-Out
+    &.tooltip-ease-out{
+        opacity: 0;
+        transition: margin 142ms linear, opacity 142ms linear;
+        -moz-transition: margin 142ms linear, opacity 142ms linear;
+        -webkit-transition: margin 142ms linear, opacity 142ms linear;
+
+        &.show{
+            margin: 0;
+            opacity: 1.0;
+        }
+        &.tooltip-top{
+            margin: 15px 0 0 0;
+        }
+        &.tooltip-left{
+            margin: 0 0 0 15px;
+        }
+        &.tooltip-right{
+            margin: 0 0 0 -15px;
+        }
+        &.tooltip-bottom{
+            margin: -15px 0 0 0;
+        }
+        &.tooltip-top.show,
+        &.tooltip-left.show,
+        &.tooltip-right.show,
+        &.tooltip-bottom.show{
+            margin: 0;
+        }
+    }
+}
+/* @end TOOLTIPs */
