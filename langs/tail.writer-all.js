@@ -1,6 +1,6 @@
 /*
  |  tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!
- |  @file       ./langs/tail.writer-de.js
+ |  @file       ./langs/tail.writer-all.js
  |  @author     SamBrishes <sam@pytes.net>
  |  @version    0.4.0 - Beta
  |

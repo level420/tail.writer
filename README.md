@@ -1,218 +1,196 @@
 tail.writer
 ============
-[![npm](https://img.shields.io/npm/v/tail.writer.svg?style=flat-square)](https://www.npmjs.com/package/tail.writer)
-[![npm](https://img.shields.io/npm/dt/tail.writer.svg?style=flat-square)](https://www.npmjs.com/package/tail.writer)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![plainJS](https://img.shields.io/badge/plainJS-%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%9C%AB-yellow.svg?style=flat-square)](https://plainjs.com/javascript/plugins/tailwriter-186/)
-[![Author](https://img.shields.io/badge/Author-SamBrishes@pytesNET-lightgrey.svg?style=flat-square)](https://www.github.com/pytesNET)
+[![plainJS](https://s.pytes.net/cb2d2d94)](https://s.pytes.net/305f45f2)
+[![npm Version](https://s.pytes.net/79c4dbb4)](https://s.pytes.net/f6deba28)
+[![npm Downloads](https://s.pytes.net/d84c0033)](https://s.pytes.net/f6deba28)
+[![License](https://s.pytes.net/8257ac72)](LICENSE.md)
+[![Author](https://s.pytes.net/5542d1fa)](https://s.pytes.net/5be37d0a)
 
-A light-weight, powerful and Open Source GitHub Flavored Markdown editor, written in pure vanilla
-JavaScript with a jQuery and a MooTools implementation.
+The **tail.writer** script is a neat, powerful, highly extend- and translatable Markup Editor,
+written in Vanilla JavaScript. It currently supports the [GitHub Flavored] Markdown, BBCode and
+Textile Markup languages.
 
-[Demonstration](https://github.pytes.net/tail.writer)
+[Wanna see **tail.writer** in action?](https://github.pytes.net/tail.writer)
 
-Work in Progress
-----------------
-The script is still Work in Progress!
+[Wanna translate **tail.writer** in your language?](https://github.com/pytesNET/tail.writer/wiki/Help-Translating)
 
-How to use
-----------
-```javascript
-// Vanilla Edition
-    document.addEventListener("DOMContentLoaded", function(){
-        var options = { /* Your Options */ };
+Features
+--------
+-   Compatible with all modern browsers, and also for **IE >= 9**.
+-   WriteFlow supportive Features & Functions
+-   A Translation API to use your websites-native language
+-   An extensive Markup API to use custom Markup languages and actions
+-   Hooks, Event Listeners & Key-Bindings for your own code
+-   No dependencies, just include and use it (except the Preview-Action)!
+-   Bindings for the jQuery and MooTools library and usable as **AMD**.
+-   3 beautiful Designs and many settings!
 
-        // Just use an CSS Selector...
-        tail.writer(".my-tail-editor", options);
+### WYSIWYG vs. Markup
+The tail.writer script is **not a WYSIWYG** (What you see is what you get) editor, it's a Markup
+editor. The difference is the presentation of the written text: A WYSIWYG editor shows a bold text
+directly as **bold text**, while a Markup editor shows only the Markup syntax: \*\*bold text\*\*.
+(The shown syntax depends on the used Markup language, of course!)
 
-        // ... or an Element
-        tail.writer(document.getElementById("tail-editor"), options);
-    });
+However, you still have the possibility to add a Preview toolbar action to each single Markup
+language. The Preview View is not editable and requires an additional JavaScript parser depending
+on the used Markup language. We currently support the following libraries:
 
-// jQuery Edition
-    jQuery(document).ready(function(){
-        var options = { /* Your Options */ };
+-   [GF] Markdown - [marked](https://github.com/markedjs/marked)
+-   [GF] Markdown - [showdown](https://github.com/showdownjs/showdown)
+-   Textile - [textile.js](https://github.com/borgar/textile-js)
+-   BBCode - [tail.BBSolid](https://github.com/pytesNET/tail.BBSolid)
 
-        // The known jQuery method
-        jQuery(".my-tail-editor").tailWriter(options);
-    });
+You can also use your own (or a not supported) parser library, of course. Check out the option
+[`previewConverter`](https://github.com/pytesNET/tail.writer/wiki/Available-Options#previewconverter),
+which allows you to pass your own parser callback function !
 
-// MooTools Edition
-    window.addEvent("domready", function(){
-        var options = { /* Your Options */ };
+Install & Embed
+---------------
+The master branch will always contain the latest Version (incl. not-released updates), which you can
+download directly here as [.tar](https://github.com/pytesNET/tail.writer/tarball/master) or as
+[.zip](https://github.com/pytesNET/tail.writer/zipball/master) archive, or just visit the Releases
+Page on GitHub directly. You can also be cool and using npm, Yarn or bower:
 
-        // Single Selector
-        $("my-textarea").tailWriter(options);
-
-        // Multi Selector
-        $$("my-textareas").tailWriter(options);
-    });
+```markup
+npm install tail.writer --save
 ```
 
-Available Options
------------------
-```javascript
-tailWriter.defaults = {
-    width:            "100%",
-    height:           ["200px", "500px"],
-    classes:          "",
-    resize:           true,
-    indentTab:        false,
-    indentSize:       4,
-    toolbar:          [
-        "headers", "|", "bold", "italic", "strikethrough", "|", "quote", "code",
-        "codeblock", "indent", "outdent", "|", "link", "image", "table", "hr", "|",
-        "list:unordered", "list:ordered", "|", "preview"
-    ],
-    tooltip:          "top",
-    statusbar:        true
-};
-```
-| Title         | Type          | Description |
-| ------------- |:-------------:| ----------- |
-| width         | ``string``    | Defines the width of the tail.writer container. |
-| height        | ``array``     | Defines the height of the tail.writer container used as [minHeight, maxHeight]. The maxHeight parameter is used for the `resize` function. |
-| classes       | ``string``    | Adds additional, custom class names to the tail.writer container element. |
-| resize        | ``boolean``   | Set this to `true` to adapt the height of the textarea field to the content, limited to the `height` option. |
-| indentTab     | ``boolean``   | Set this to `true` to use Tabs (`\t`) for indenting, and `false` to use spaces (depending on `indentSize`). |
-| indentSize    | ``integer``   | Defines the number of spaces for each indent step, requires `indentTab: false`! |
-| toolbar       | ``array``     | Defines the actions / buttons within the shown toolbar. |
-| tooltip       | ``string``    | Defines the position of the action / button tooltip position (use `false` to disable the tooltips). |
-| statusbar     | ``boolean``   | Set this to `true` to enable the statusbar, which shows meta informations / counter data. |
-
-
-Available Toolbar Buttons
--------------------------
-The new toolbar action API allows to set arguments after the action name, separated with a colon:
-`<action_name>:<param1>[,<param2>]`. A concrete example of this shows the single header action:
-`header:3`, which creates a toolbar action button which inserts a `### ` (aka `<h3></h3>`) markup.
-
-### Header
-```javascript
-Action:     "header:<size>"
-Markup:     "$1\n==========" | "$1\n----------" | "# $1"
-Arguments:  <size:int>
-```
-Shows a single header action button, use a `size` between `1` and `6` (for `<h1>` ... `<h6>` respectively).
-
-### Headers (Dropdown)
-```javascript
-Action:     "headers:<type>"
-Markup:     "$1\n==========" | "$1\n----------" | "# $1"
-Arguments:  <type:string>
-```
-Shows all or just 3 (use `"x3"` as `type` argument) header variants within a Dropdown field.
-
-### Bold
-```javascript
-Action:     "bold"
-Markup:     "**$1**"
-Arguments:  null
+```markup
+yarn add tail.writer --save
 ```
 
-### Italic
-```javascript
-Action:     "italic"
-Markup:     "_$1_"
-Arguments:  null
+```markup
+bower install tail.writer --save
 ```
 
-### Underline
-```javascript
-Action:     "underline"
-Markup:     "<u>$1</u>"
-Arguments:  null
+### Using a CDN
+You can also use the awesome CDN services from jsDelivr or UNPKG.
+
+```markup
+https://cdn.jsdelivr.net/npm/tail.writer@latest/
 ```
 
-### Strikethrough
-```javascript
-Action:     "strikethough"
-Markup:     "~~$1~~"
-Arguments:  null
+```markup
+https://unpkg.com/tail.writer/
 ```
 
-### Inline Code
-```javascript
-Action:     "code"
-Markup:     "`$1`"
-Arguments:  null
+Real-World Examples
+-------------------
+Do you use **tail.writer** in one of your project? Don't wait, write us at info@pytes.net and get
+listed below too!
+
+### [Bludit](https://github.com/bludit/bludit)
+The [**tail.writer**](https://github.com/bludit-plugins/tail.writer) Markup Editor is available for
+the awesome Flat-File Content Management System [Bludit](https://github.com/bludit/bludit).
+
+Thanks To
+---------
+-   [Octicons](https://octicons.github.com/) for the cute Icons
+-   [jsCompress](https://jscompress.com/) for the Compressor
+-   [prismJS](https://prismjs.com) for the Syntax highlighting library
+-   [MenuSpy](https://github.com/lcdsantos/menuspy) for the Menu Navigation
+
+Documentation
+-------------
+The Documentation has been moved to [GitHubs Wiki Pages](https://github.com/pytesNET/tail.writer/wiki),
+but I will keep a table of contents list here and some basic instructions.
+
+-   [Install & Embed](https://github.com/pytesNET/tail.writer/wiki/Instructions)
+-   [Default Usage](https://github.com/pytesNET/tail.writer/wiki/Default-Usage)
+-   [Available Options](https://github.com/pytesNET/tail.writer/wiki/Available-Options)
+-   [Available Methods](https://github.com/pytesNET/tail.writer/wiki/Available-Methods)
+-   [Events & Callbacks](https://github.com/pytesNET/tail.writer/wiki/Callback-Handler)
+-   [Internal Variables & Methods](https://github.com/pytesNET/tail.writer/wiki/Internal)
+-   [HowTos, Tips & Tricks](https://github.com/pytesNET/tail.writer/wiki/How-Tos)
+
+### Extended Docs
+-   [Markup Overview](https://github.com/pytesNET/tail.writer/wiki/Markup%3A-Overview)
+-   [Markup API](https://github.com/pytesNET/tail.writer/wiki/Markup%3A-API)
+-   [Plugin API](https://github.com/pytesNET/tail.writer/wiki/Plugin%3A-API)
+
+### Files
+The **tail.writer** package contains many files and directories, which may confuse. The `less`
+folder can be ignored, unless you want to write a completely own design using the icon set or
+one of our designs as basic template. Basically the `css` and `js` folders (and the `markups` /
+`langs` directories maybe too) contains the main files, which you need to embed on your website.
+The content within the `css` folder should be self explanatory, the other ones contains these files:
+
+-   `js/tail.writer(.min).js` - Contains the main script, WITHOUT any markup language.
+-   `js/tail.writer-<markup>(.min).js` - Contains the main script, INCLUDING the named markup language.
+-   `js/tail.writer-full(.min).js` - Contains the main script, INCLUDING ALL markup and interface languages.
+-   `langs/tail.writer-all.js` - Contains all available interface languages.
+-   `langs/tail.writer-<lang_code>.js` - Contains just the named interface language.
+-   `markups/tail.markup-all.js` - Contains all available markup languages.
+-   `markups/tail.markup-<markup>.js` - Contains just the named markup language.
+
+In other words: No main action / button will be available if you just embed the `js/tail.writer(.min).js`
+file. So either embed the desired markup language (within the `markups` directory) too or use a
+direct bundle (or the full package).
+
+### Basic Instructions
+It's highly recommended to load the Stylesheet within your HTML Header, while you pass the
+desired JavaScript files after the opened `<body>` tag (you can also include them before the
+closing `</body>` tag, of course). Please make sure you load the Markup and Interface languages as
+well as all plugins AFTER the main script. the `tail.writer()` function should be called within
+the "DOMContentLoaded" event.
+
+You can pass up to 2 arguments to the **tail.writer** constructor, the first parameter is required
+and need to be an `Element`, a `NodeList`, a `HTMLCollection`, an `Array` with `Element` objects or
+just a single selector as `String`, which calls the `.querySelectorAll()` method on its own.
+The second parameter is optional and, if set, MUST be an `object` with your **tail.writer** options.
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+
+        <link type="text/css" rel="stylesheet" href="css/tail.writer-white.min.css" />
+    </head>
+    <body>
+        <script type="text/javascript" src="js/tail.writer-{markup}.min.js"></script>
+        <!-- <script type="text/javascript" src="langs/tail.writer-{lang}.js"></script> -->
+
+        <textarea></textarea>
+
+        <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", function(){
+                tail.writer("textarea", { /* Your Options */ });
+            });
+        </script>
+    </body>
+</html>
 ```
 
-### Horizontal Rule
+### Default Options
+Please check out [GitHubs Wiki Pages](https://github.com/pytesNET/tail.writer/wiki/Available-Options)
+to read more about each single option!
+
 ```javascript
-Action:     "hr"
-Markup:     "----------"
-Arguments:  null
+tail.writer("textarea", {
+    classNames: null,               // New in 0.4.0
+    debug: false,                   // New in 0.4.0
+    disabled: false,                // New in 0.4.0
+    doubleLineBreak: false,         // New in 0.4.0
+    fullscreenParent: d.body,       // New in 0.4.0
+    height: [200, 500],
+    indentTab: false,
+    indentSize: 4,
+    locale: "en",                   // New in 0.4.0
+    markup: null,                   // New in 0.4.0
+    preventBindings: false          // New in 0.4.0
+    previewConverter: null,         // New in 0.4.0
+    readonly: false,                // New in 0.4.0
+    resize: true,
+    statusbar: true,
+    toolbar: [],
+    toolbarMultiLine: true,         // New in 0.4.0
+    toolbarScrollable: true,        // New in 0.4.0
+    tooltip: "top",
+    width: "100%"
+});
 ```
 
-### Pre Clode Block
-```javascript
-Action:     "codeblock"
-Markup:     "```\n$1\n```"
-Arguments:  null
-```
-
-### Blockquote
-```javascript
-Action:     "quote"
-Markup:     ">\t$1"
-Arguments:  null
-```
-
-### List
-```javascript
-Action:     "list:<type>"
-Markup:     "-\t$1" | "1.\t$1" | "- [ ]\t$1" | "- [x]\t$1"
-Arguments:  <type:string>
-```
-Creates a List use `"unordered"`, `"ordered"`, `"unchecked"` or `"checked"` as type argument to
-configure the list.
-
-### Link
-```javascript
-Action:     "link:<type>"
-Markup:     "[$1](url)"
-Arguments:  <type:string>
-```
-Creates a clickable Hyperlink, use `"dropdown"` or `"dialog"` as `type` argument to create a Dropdown
-or Dialog box or use no argument to just insert the respective marup!
-
-### Image
-```javascript
-Action:     "image:<type>"
-Markup:     "![$1](url)"
-Arguments:  <type:string>
-```
-Creates a Image Link / Embed, use `"dropdown"` or `"dialog"` as `type` argument to create a Dropdown
-or Dialog box or use no argument to just insert the respective marup!
-
-### Table
-```javascript
-Action:     "table:<type>"
-Markup:     "![$1](url)"
-Arguments:  <type:string>
-```
-Creates a Table Structure, use `"dropdown"` or `"dialog"` as `type` argument to create a Dropdown or
-Dialog box.
-
-### Indent
-```javascript
-Action:     "indent"
-Markup:     "\t$1"
-Arguments:  null
-```
-
-### Outdent
-```javascript
-Action:     "outdent"
-Markup:     null
-Arguments:  null
-```
-
-### Preview
-```javascript
-Action:     "preview"
-Markup:     null
-Arguments:  null
-```
-Parses the Markdown Markup content, requires [marked](https://github.com/markedjs/marked).
+Copyright & License
+-------------------
+Published under the MIT-License; Copyright © 2015 - 2019 SamBrishes, pytesNET
