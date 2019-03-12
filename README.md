@@ -90,6 +90,9 @@ Thanks To
 -   [prismJS](https://prismjs.com) for the Syntax highlighting library
 -   [MenuSpy](https://github.com/lcdsantos/menuspy) for the Menu Navigation
 
+### Translations
+-   [Wojciech Jodla](https://github.com/Joduai) / Polish Translation
+
 Documentation
 -------------
 The Documentation has been moved to [GitHubs Wiki Pages](https://github.com/pytesNET/tail.writer/wiki),
