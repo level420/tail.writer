@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Unreleased Changes
+------------------
+-   Add: The new Polish Translation. Many Thanks to [Wojciech Jodla](https://github.com/Joduai)!
+
 Version 0.4.0 - Beta
 --------------------
 -   Info: This is the first version which supports different markup languages, therefore the
