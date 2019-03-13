@@ -524,13 +524,13 @@
             "headers", "font", "size", "color", "|", "bold", "italic", "underline", "strikethrough",
             "|", "code", "codeblock", "quote", "indent", "outdent", "|", "left", "center", "right",
             "justify", "|", "link", "image", "list:unordered", "list:ordered", "table", "|",
-            "preview", "fullscreen", "help"
+            "preview", "fullscreen", "about"
         ],
         full: [
             "headers", "font", "size", "color", "|", "bold", "italic", "underline", "strikethrough",
             "|", "code", "big", "small", "sub", "sup", "|", "quote", "codeblock", "indent", "outdent",
             "|", "left", "center", "right", "justify", "|", "link:dialog", "email:dialog", "image:dialog",
-            "|", "list:unordered", "list:ordered", "table", "hr", "|", "preview", "fullscreen", "help"
+            "|", "list:unordered", "list:ordered", "table", "hr", "|", "preview", "fullscreen", "about"
         ]
     }, function(content, markup){
         if(typeof(w.tail.BBSolid) === "function"){

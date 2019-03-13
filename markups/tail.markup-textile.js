@@ -394,14 +394,14 @@
         default: [
             "headers", "|", "bold", "italic", "underline", "strikethrough", "|", "code", "codeblock",
             "quote", "indent", "outdent", "|", "left", "center", "right", "justify", "|", "link",
-            "image", "list:unordered", "list:ordered", "table", "|", "preview", "fullscreen", "help"
+            "image", "list:unordered", "list:ordered", "table", "|", "preview", "fullscreen", "about"
         ],
         full: [
             "headers", "|", "bold", "italic", "underline", "strikethrough", "|", "cite", "code",
             "span", "sub", "sup", "|", "pre", "codeblock", "quote", "indent", "outdent", "|",
             "left", "center", "right", "justify", "|", "link:dialog", "image:dialog", "acronym", "|",
             "list:unordered", "list:ordered", "definition", "table", "hr", "|", "preview",
-            "fullscreen", "help"
+            "fullscreen", "about"
         ]
     }, function(content){
         if(typeof(textile) === "function"){
