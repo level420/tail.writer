@@ -356,13 +356,13 @@
         default: [
             "headers", "|", "bold", "italic", "strikethrough", "|", "quote", "code",
             "codeblock", "indent", "outdent", "|", "link", "image", "table", "hr", "|",
-            "list:unordered", "list:ordered", "|", "preview", "fullscreen", "help"
+            "list:unordered", "list:ordered", "|", "preview", "fullscreen", "about"
         ],
         full: [
             "headers", "|", "bold", "italic", "underline", "strikethrough", "|", "quote", "code",
             "codeblock", "indent", "outdent", "|", "link:dialog", "image:dialog", "table", "hr", "|",
             "list:unordered", "list:ordered", "list:unchecked", "list:checked", "|",
-            "preview", "fullscreen", "help"
+            "preview", "fullscreen", "about"
         ]
     }, function(content, markup){
         if(typeof(marked) === "function"){

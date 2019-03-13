@@ -800,13 +800,13 @@
         default: [
             "headers", "|", "bold", "italic", "strikethrough", "|", "quote", "code",
             "codeblock", "indent", "outdent", "|", "link", "image", "table", "hr", "|",
-            "list:unordered", "list:ordered", "|", "preview", "fullscreen", "help"
+            "list:unordered", "list:ordered", "|", "preview", "fullscreen", "about"
         ],
         full: [
             "headers", "|", "bold", "italic", "underline", "strikethrough", "|", "quote", "code",
             "codeblock", "indent", "outdent", "|", "link:dialog", "image:dialog", "table", "hr", "|",
             "list:unordered", "list:ordered", "list:unchecked", "list:checked", "|",
-            "preview", "fullscreen", "help"
+            "preview", "fullscreen", "about"
         ]
     }, function(content, markup){
         if(typeof(marked) === "function"){
@@ -1180,14 +1180,14 @@
         default: [
             "headers", "|", "bold", "italic", "underline", "strikethrough", "|", "code", "codeblock",
             "quote", "indent", "outdent", "|", "left", "center", "right", "justify", "|", "link",
-            "image", "list:unordered", "list:ordered", "table", "|", "preview", "fullscreen", "help"
+            "image", "list:unordered", "list:ordered", "table", "|", "preview", "fullscreen", "about"
         ],
         full: [
             "headers", "|", "bold", "italic", "underline", "strikethrough", "|", "cite", "code",
             "span", "sub", "sup", "|", "pre", "codeblock", "quote", "indent", "outdent", "|",
             "left", "center", "right", "justify", "|", "link:dialog", "image:dialog", "acronym", "|",
             "list:unordered", "list:ordered", "definition", "table", "hr", "|", "preview",
-            "fullscreen", "help"
+            "fullscreen", "about"
         ]
     }, function(content){
         if(typeof(textile) === "function"){
@@ -1674,13 +1674,13 @@
             "headers", "font", "size", "color", "|", "bold", "italic", "underline", "strikethrough",
             "|", "code", "codeblock", "quote", "indent", "outdent", "|", "left", "center", "right",
             "justify", "|", "link", "image", "list:unordered", "list:ordered", "table", "|",
-            "preview", "fullscreen", "help"
+            "preview", "fullscreen", "about"
         ],
         full: [
             "headers", "font", "size", "color", "|", "bold", "italic", "underline", "strikethrough",
             "|", "code", "big", "small", "sub", "sup", "|", "quote", "codeblock", "indent", "outdent",
             "|", "left", "center", "right", "justify", "|", "link:dialog", "email:dialog", "image:dialog",
-            "|", "list:unordered", "list:ordered", "table", "hr", "|", "preview", "fullscreen", "help"
+            "|", "list:unordered", "list:ordered", "table", "hr", "|", "preview", "fullscreen", "about"
         ]
     }, function(content, markup){
         if(typeof(w.tail.BBSolid) === "function"){
