@@ -1,10 +1,10 @@
 tail.writer
 ============
+[![npm Version](https://s.pytes.me/b524a518)](https://s.pytes.net/f6deba28)
+[![npm Downloads](https://s.pytes.me/0593ede6)](https://s.pytes.net/f6deba28)
+[![Support Me](https://s.pytes.me/4a1717aa)](https://buymeacoffee.com/pytesNET)
 [![plainJS](https://s.pytes.net/cb2d2d94)](https://s.pytes.net/305f45f2)
-[![npm Version](https://s.pytes.net/79c4dbb4)](https://s.pytes.net/f6deba28)
-[![npm Downloads](https://s.pytes.net/d84c0033)](https://s.pytes.net/f6deba28)
-[![License](https://s.pytes.net/8257ac72)](LICENSE.md)
-[![Author](https://s.pytes.net/5542d1fa)](https://s.pytes.net/5be37d0a)
+[![License](https://s.pytes.me/8257ac72)](LICENSE.md)
 
 The **tail.writer** script is a neat, powerful, highly extend- and translatable Markup Editor,
 written in Vanilla JavaScript. It currently supports the [GitHub Flavored] Markdown, BBCode and
@@ -13,6 +13,14 @@ Textile Markup languages.
 [Wanna see **tail.writer** in action?](https://github.pytes.net/tail.writer)
 
 [Wanna translate **tail.writer** in your language?](https://github.com/pytesNET/tail.writer/wiki/Help-Translating)
+
+Support
+-------
+<p align="center" atyle="text-align:center">
+You really like my <b>tail.writer</b> script and want to support me and all of my projects?<br/>
+Then I would be extremely grateful for a coffee! (<b>Thanks to all Supporters</b>)<br/><br/>
+<a href="https://www.buymeacoffee.com/pytesNET"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" title="Buy Me A Coffee" /></a>
+</p>
 
 Features
 --------
