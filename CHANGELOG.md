@@ -1,9 +1,16 @@
 Changelog
 =========
 
-Unreleased Changes
-------------------
+Version 0.4.1 - Beta
+--------------------
+-   Info: This is the first version, which drops IE 9 support!
 -   Add: The new Polish Translation. Many Thanks to [Wojciech Jodla](https://github.com/Joduai)!
+-   Add: Support for module exporting, tested with browserify.
+-   Update: The `package.json`and `bower.json` variables.
+-   Update: Using `classList` to add / remove / check class names.
+-   Update: Using `Object.assign` only to merge / clone object properties.
+-   Update: Clone language strings (with the english ones, for backward compatibilities).
+-   Remove: Support for Internet Explorer 9.
 
 Version 0.4.0 - Beta
 --------------------

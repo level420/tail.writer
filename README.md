@@ -1,9 +1,9 @@
 tail.writer
 ============
-[![npm Version](https://s.pytes.me/b524a518)](https://s.pytes.net/f6deba28)
-[![npm Downloads](https://s.pytes.me/0593ede6)](https://s.pytes.net/f6deba28)
+[![npm Version](https://s.pytes.me/b524a518)](https://s.pytes.me/f6deba28)
+[![npm Downloads](https://s.pytes.me/0593ede6)](https://s.pytes.me/f6deba28)
 [![Support Me](https://s.pytes.me/4a1717aa)](https://buymeacoffee.com/pytesNET)
-[![plainJS](https://s.pytes.net/cb2d2d94)](https://s.pytes.net/305f45f2)
+[![plainJS](https://s.pytes.me/cb2d2d94)](https://s.pytes.me/305f45f2)
 [![License](https://s.pytes.me/8257ac72)](LICENSE.md)
 
 The **tail.writer** script is a neat, powerful, highly extend- and translatable Markup Editor,
@@ -24,14 +24,17 @@ Then I would be extremely grateful for a coffee! (<b>Thanks to all Supporters</b
 
 Features
 --------
--   Compatible with all modern browsers, and also for **IE >= 9**.
--   WriteFlow supportive Features & Functions
--   A Translation API to use your websites-native language
--   An extensive Markup API to use custom Markup languages and actions
--   Hooks, Event Listeners & Key-Bindings for your own code
--   No dependencies, just include and use it (except the Preview-Action)!
--   Bindings for the jQuery and MooTools library and usable as **AMD**.
--   3 beautiful Designs and many settings!
+-   Three beautiful designs and many actions and buttons.
+-   WriteFlow supportive features & functions.
+-   Support for Markdown (Marked, Showdown), Textile (textile.js) and BBCodes (tail.BBSolid).
+-   Extensive Markup API to use custom Markup languages and actions.
+-   Hooks, Event Listeners & Key-Bindings for your own code.
+-   Completely Translatable and already available in multiple languages.
+-   Many Settings to adapt and configure the design and behaviour.
+-   Supports AMD (requireJS) and available as browserify module.
+-   Compatible with all modern browsers **(including IE 10+)**
+-   No Dependencies, just embed and use (except the Preview action)
+-   Free/To/Use - MIT Licensed
 
 ### WYSIWYG vs. Markup
 The tail.writer script is **not a WYSIWYG** (What you see is what you get) editor, it's a Markup

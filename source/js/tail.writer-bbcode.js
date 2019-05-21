@@ -2,7 +2,7 @@
  |  tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!
  |  @file       ./js/tail.writer-bbcode.js
  |  @author     SamBrishes <sam@pytes.net>
- |  @version    0.4.0 - Beta
+ |  @version    0.4.1 - Beta
  |
  |  @website    https://github.com/pytesNET/tail.writer
  |  @license    X11 / MIT License
@@ -10,46 +10,45 @@
  */
 /*
  |  BUNDLED VERSION: `tail.writer` + `tail.markup-bbcode`
-*/
-;(function(factory){
-    if(typeof(define) == "function" && define.amd){
-        define(function(){ return factory(window); });
+ */
+;(function(root, factory){
+    if(typeof define === "function" && define.amd){
+        define(function(){ return factory(root); });
+    } else if(typeof module === "object" && module.exports){
+        module.exports = factory(root);
     } else {
-        if(typeof(window.tail) == "undefined"){
-            window.tail = {};
+        if(typeof root.tail === "undefined"){
+            root.tail = {};
         }
-        window.tail.writer = factory(window);
+        root.tail.writer = factory(root);
 
-        if(typeof(jQuery) != "undefined"){
+        // jQuery Support
+        if(typeof jQuery !== "undefined"){
             jQuery.fn.tailwriter = function(o){
                 var r = [], i;
                 this.each(function(){ if((i = tail.writer(this, o)) !== false){ r.push(i); } });
                 return (r.length === 1)? r[0]: (r.length === 0)? false: r;
-            }
+            };
         }
+
+        // MooTools Support
         if(typeof(MooTools) != "undefined"){
             Element.implement({ tailwriter: function(o){ return new tail.writer(this, o); } });
         }
     }
-}(function(root){
+}(this, function(root){
     "use strict";
     var w = root, d = root.document, tail = {};
 
     // Internal Helper Methods
-    var cHAS = tail.cHAS = function(e, name){
-        return (new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)")).test((e.className || ""));
+    var cHAS = tail.cHAS = function(el, name){
+        return (!el.classList)? false: el.classList.contains(name);
     };
-    var cADD = tail.cADD = function(e, name){
-        if(!(new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)")).test(e.className || name)){
-            e.className += " " + name;
-        }
-        return e;
+    var cADD = tail.cADD = function(el, name){
+        return (!el.classList)? false: (el.classList.add(name))? el: el;
     };
-    var cREM = tail.cREM = function(e, name, regex){
-        if((regex = new RegExp("(?:^|\\s+)(" + name + ")(?:\\s+|$)")) && regex.test(e.className || "")){
-            e.className = e.className.replace(regex, "");
-        }
-        return e;
+    var cREM = tail.cREM = function(el, name){
+        return (!el.classList)? false: (el.classList.remove(name))? el: el;
     };
     var trigger = tail.trigger = function(el, event, opt){
         if(CustomEvent && CustomEvent.name){
@@ -60,15 +59,8 @@
         }
         return el.dispatchEvent(ev);
     };
-    var clone = tail.clone = function(target, source){
-        source = (typeof(source) == "object")? source: {};
-        if(Object.assign){
-            return Object.assign({}, target, source);
-        }
-        var clone = new Object();
-        for(var key in target){ clone[key] = target[key]; }
-        for(var key in source){ clone[key] = source[key]; }
-        return clone;
+    var clone = tail.clone = function(obj, rep){
+        return Object.assign({}, obj, rep || {});
     };
     var position = tail.position = function(e, abs){
         var position = {
@@ -93,7 +85,7 @@
 
     /*
      |  CONSTRUCTOR
-     |  @version    0.4.0 [0.2.0]
+     |  @since  0.4.0 [0.2.0]
      */
     var writer = function(el, config){
         el = (typeof(el) == "string")? d.querySelectorAll(el): el;
@@ -143,7 +135,7 @@
         return this.init();
     };
     writer.__helper = tail;
-    writer.version = "0.4.0";
+    writer.version = "0.4.1";
     writer.status = "beta";
     writer.count = 0;
     writer.inst = {};
@@ -426,7 +418,7 @@
 
     /*
      |  MARKUPS :: REGISTER A NEW MARKUP
-     |  @version    0.4.0 [0.4.0]
+     |  @since  0.4.0 [0.4.0]
      |
      |  @param  string  The unique Markup ID.
      |  @param  object  The action button objects.
@@ -470,7 +462,7 @@
 
     /*
      |  MARKUPS :: UNREGISTER AN EXISTING MARKUP
-     |  @version    0.4.0 [0.4.0]
+     |  @since  0.4.0 [0.4.0]
      |
      |  @param  string  The unique Markup ID.
      |
@@ -986,7 +978,7 @@
     writer.markups.prototype = {
         /*
          |  GET A MARKUP ACTION
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         get: function(id, args){
             if(args === false){
@@ -1028,7 +1020,7 @@
 
         /*
          |  SET A MARKUP ACTION - ON THE FLY
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         set: function(id, action){
             if(typeof(action.walker) === "function"){
@@ -1044,7 +1036,7 @@
 
         /*
          |  SET TOOLBAR
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         setToolbar: function(toolbar){
             if(typeof(toolbar) === "string"){
@@ -1062,7 +1054,7 @@
 
         /*
          |  LOOP TOOLBAR
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         loopToolbar: function(){
             if(!(this.toolbar instanceof Array)){
@@ -1084,7 +1076,7 @@
 
         /*
          |  APPLY ACTION FILTER
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         filter: function(id, before, content, after, selection){
             var action = this.get(id, false);
@@ -1188,7 +1180,7 @@
 
         /*
          |  REGISTER A NEW LOCALE
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         register: function(locale, object){
             if(typeof(locale) != "string" || !(object instanceof Object)){
@@ -1200,7 +1192,7 @@
 
         /*
          |  UNREGISTER A EXISTING LOCALE
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         unregister: function(locale){
             if(!(locale in this)){
@@ -1212,7 +1204,7 @@
 
         /*
          |  GET A LOCALE STRING
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         get: function(locale, id){
             if(!(id in (this[locale] || {}))){
@@ -1223,7 +1215,7 @@
 
         /*
          |  SET / MODIFY LOCALE STRINGs
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         set: function(locale, id, string){
             if(!(locale in this)){
@@ -1278,12 +1270,12 @@
     writer.prototype = {
         /*
          |  INTERNAL :: INIT WRITER
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         init: function(){
             var self = this;
-            self.__  = writer.strings[this.con.locale] || writer.strings.en;
-            self.val = this.e.editor.value;
+            this.__ = clone(writer.strings.en, writer.strings[this.con.locale] || {});
+            this.val = this.e.editor.value;
 
             // Check Markup
             this.markup = new markups(this, this.con.markup);
@@ -1390,7 +1382,7 @@
 
         /*
          |  INTERNAL :: BUILD WRITER
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          */
         build: function(){
             var self = this, classes = ["tail-writer"], con = this.con,
@@ -1463,7 +1455,7 @@
 
         /*
          |  INTERNAL :: BUILD TOOLBAR
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         toolbar: function(){
             var inner = create("DIV", "toolbar-inner");
@@ -1575,7 +1567,7 @@
 
         /*
          |  INTERNAL :: HANDLE TOOLBAR NAVIGATION
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         toolbarResize: function(){
             if(!(!this.con.toolbarMultiLine && this.con.toolbarScrollable)){
@@ -1592,7 +1584,7 @@
 
         /*
          |  INTERNAL :: BUILD STATUSBAR
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         statusbar: function(){
             this.e.status = create("DIV", "tail-writer-statusbar");
@@ -1637,7 +1629,7 @@
 
         /*
          |  HANDLE :: COUNT DATA
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         count: function(){
             var counts = {
@@ -1659,7 +1651,7 @@
 
         /*
          |  INTERNAL :: HANDLE EVENTS
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          */
         handle: function(event){
             var self = this;
@@ -1721,7 +1713,7 @@
 
         /*
          |  INTERNAL :: WALKABLE CHECK
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          */
         walkable: function(string){
             if(string.length == 0){
@@ -1754,7 +1746,7 @@
 
         /*
          |  INTERNAL :: ERROR HANDLER
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         error: function(string){
             if(this.con.debug){
@@ -1787,7 +1779,7 @@
 
         /*
          |  HELPER :: GET / SET SELECTION
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |
          |  @param  multi   The integer where the new selection should start, undefined to return the
          |                  current selection. If start is negative, the made selection will start at
@@ -1830,7 +1822,7 @@
 
         /*
          |  HELPER :: INDENTATION
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  string  The respective action to apply:
          |                      'indent'    Indent Content by one
@@ -1889,7 +1881,7 @@
 
         /*
          |  HELPER :: INDENTER
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
          */
         indenter: function(string, action){
@@ -1905,7 +1897,7 @@
 
         /*
          |  CONTENT :: GET CONTENT
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  multi   Use undefined to get the complete content or a valid cursor position
          |                  (can also be negative). You can also pass null for the current selection
@@ -1941,7 +1933,7 @@
 
         /*
          |  CONTENT :: READ CONTENT PER LINE
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  string  The line number where you want to start reading. Use 0 to start with
          |                  the first line. You can also pass a negative integer.
@@ -1968,7 +1960,7 @@
 
         /*
          |  CONTENT :: READ
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
          */
         read: function(){
@@ -1978,7 +1970,7 @@
 
         /*
          |  CONTENT :: SPLIT CONTENT
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  multi   Use undefined to affect the complete content or a valid cursor position
          |                  (can also be negative). You can also pass null for the current selection
@@ -2015,7 +2007,7 @@
 
         /*
          |  CONTENT :: SET CONTENT
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  string  The new content, which should be written.
          |  @param  string  The handler, where the new content should be placed.
@@ -2086,7 +2078,7 @@
 
         /*
          |  CONTENT :: WRITE CONTENT (HELPER FOR `.setContent()`)
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  string  The new content, which should be written.
          |  @param  multi   The new selection, which should be made after the content has been
@@ -2104,7 +2096,7 @@
 
         /*
          |  CONTENT :: WRITE
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
          */
         write: function(content, selection){
@@ -2114,7 +2106,7 @@
 
         /*
          |  CONTENT :: GET / SET PREVIOUS LINE
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  multi   Use `undefined` to return the previous line, depending on the cursor
          |                  position. Pass a line to replace it.
@@ -2140,7 +2132,7 @@
 
         /*
          |  CONTENT :: CURRENT LINE
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  multi   Use `undefined` to return the current line, depending on the cursor
          |                  position. Pass a line to replace it.
@@ -2163,7 +2155,7 @@
 
         /*
          |  CONTENT :: NEXT LINE
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  multi   Use `undefined` to return the nextline, depending on the cursor
          |                  position. Pass a line to replace it.
@@ -2189,7 +2181,7 @@
 
         /*
          |  HANDLE :: RESIZE EDITOR EIGHT
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          */
         resize: function(scroll){
             if(!this.con.resize){
@@ -2218,7 +2210,7 @@
 
         /*
          |  HANDLE :: TOOLTIPS
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          */
         tooltip: function(event, element){
             if(cHAS(this.e.main, "disabled") || cHAS(this.e.main, "readonly")){
@@ -2297,7 +2289,7 @@
 
         /*
          |  HANDLE :: UPDATE WRITER
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         update: function(){
             writer.load.call(this, "update");
@@ -2307,7 +2299,7 @@
 
         /*
          |  API :: PERFORM ACTION
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          */
         perform: function(id, args){
             if(cHAS(this.e.main, "disabled") || cHAS(this.e.main, "readonly")){
@@ -2338,7 +2330,7 @@
 
         /*
          |  API :: GENERAL INLINE ACTION
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          */
         do_inline: function(markup, action, args, map){
             var sel = this.selection(), val = this.splitContent(sel);
@@ -2362,7 +2354,7 @@
 
         /*
          |  API :: GENERAL BLOCK ACTION
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          */
         do_block: function(markup, action, args, map){
             var sel = this.selection(), val = this.splitContent(sel);
@@ -2391,7 +2383,7 @@
 
         /*
          |  API :: SHOW ELEMENT
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         showElement: function(type, id, inner, callback){
             if(cHAS(this.e.main, "disabled") || cHAS(this.e.main, "readonly")){
@@ -2451,7 +2443,7 @@
 
         /*
          |  API :: SHOW DIALOG
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
          */
         showDialog: function(_1, _2, _3){
@@ -2461,7 +2453,7 @@
 
         /*
          |  API :: SHOW DROPDOWN
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
          */
         showDropdown: function(_1, _2, _3){
@@ -2471,7 +2463,7 @@
 
         /*
          |  API :: HIDE ELEMENT
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          */
         hideElement: function(type, id){
             if(id === undefined){
@@ -2500,7 +2492,7 @@
 
         /*
          |  API :: HIDE DIALOG
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
          */
         hideDialog: function(){
@@ -2510,7 +2502,7 @@
 
         /*
          |  API :: HIDE DROPDOWN
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |  @deprecated 0.4.0 [0.6.0] (MARKED FOR REMOVAL)
          */
         hideDropdown: function(){
@@ -2521,7 +2513,7 @@
 
         /*
          |  PUBLIC :: EVENT LISTENER
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  string  The respective event listener name. The core ones are:
          |                  'input'             Triggers when the content gets changed
@@ -2553,7 +2545,7 @@
 
         /*
          |  PUBLIC :: BIND KEY / COMBINATION
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  int     The respective event keyCode (not the key name!).
          |  @param  callb.  The callback function.
@@ -2586,7 +2578,7 @@
 
         /*
          |  PUBLIC :: GET | SET CONFIGURATION
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  multi   Use undefined to return the complete config object, use the single key to
          |                  return or set the respective value of this option or pass an object with
@@ -2618,7 +2610,7 @@
 
         /*
          |  PUBLIC :: DISABLE INSTANCE AND EDITOR
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @return multi   The option object (on undefined), the respective value (if the key is
          |                  defined) or the prototype instance otherwise.
@@ -2630,7 +2622,7 @@
 
         /*
          |  PUBLIC :: ENABLE INSTANCE AND EDITOR
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @return multi   The option object (on undefined), the respective value (if the key is
          |                  defined) or the prototype instance otherwise.
@@ -2642,7 +2634,7 @@
 
         /*
          |  PUBLIC :: SET INTO READONLY MODE
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @param  bool    TRUE to enable readonly, FALSE to disable.
          |
@@ -2656,7 +2648,7 @@
 
         /*
          |  PUBLIC :: REMOVE WRITER
-         |  @version    0.4.0 [0.2.0]
+         |  @since  0.4.0 [0.2.0]
          |
          |  @return this    The prototype instance.
          */
@@ -2675,7 +2667,7 @@
 
         /*
          |  PUBLIC :: RELOAD WRITER
-         |  @version    0.4.0 [0.4.0]
+         |  @since  0.4.0 [0.4.0]
          |
          |  @return this    The prototype instance.
          */

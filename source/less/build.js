@@ -2,7 +2,7 @@
  |  tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!
  |  @file       ./less/build.less
  |  @author     SamBrishes <sam@pytes.net>
- |  @version    0.4.0 [0.4.0] - Alpha
+ |  @version    0.4.1 [0.4.0] - Alpha
  |
  |  @website    https://github.com/pytesNET/tail.writer
  |  @license    X11 / MIT License
@@ -25,7 +25,7 @@ const headerCSS = `@charset "UTF-8";
  |  tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!
  |  @file       ./css/tail.writer-{design}.css
  |  @author     SamBrishes <sam@pytes.net>
- |  @version    0.4.0 - Beta
+ |  @version    0.4.1 - Beta
  |
  |  @website    https://github.com/pytesNET/tail.writer
  |  @license    X11 / MIT License
@@ -36,7 +36,7 @@ const headerCSS = `@charset "UTF-8";
 /*# sourceMappingURL={source} */
 `; // Empty Last Line
 
-const headerMIN = `@charset "UTF-8"; /* tail.writer v0.4.0 (Beta) */
+const headerMIN = `@charset "UTF-8"; /* tail.writer v0.4.1 (Beta) */
 /* @author SamBrishes <sam@pytes.net> | @github pytesNET/tail.writer | @license MIT | @copyright pytesNET <info@pytes.net> */
 {css}
 /*# sourceMappingURL={source} */`;

@@ -20,8 +20,8 @@
     "homepage": "https://github.com/pytesNET/tail.writer",
 
     "main": [
-        "js/tail.writer-full.min.js",
-        "css/tail.writer-white.min.css"
+        "js/tail.writer-full.js",
+        "css/tail.writer-white.css"
     ],
     "repository": {
         "type": "git",
