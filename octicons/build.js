@@ -12,7 +12,7 @@ let writeIcons = () => {
 //  tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!
 //  @file       ./less/_octicons.less
 //  @author     SamBrishes <sam@pytes.net>
-//  @version    0.4.0 - Beta
+//  @version    0.4.1 - Beta
 //
 //  @website    https://github.com/pytesNET/tail.writer
 //  @license    X11 / MIT License

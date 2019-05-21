@@ -1,6 +1,6 @@
 {
     "name": "tail.writer",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "A tidy, powerful and extendable Markup ([GitHub Flavored] Markdown, BBCode, Textile) Editor, written in Vanilla JavaScript!",
     "keywords": [
         "markup",
@@ -32,5 +32,6 @@
     },
 
     "reveal": true,
-    "jsdelivr": "js/tail.writer-full.min.js"
+    "browser": "js/tail.writer-full.js",
+    "jsdelivr": "js/tail.writer-full.js"
 }

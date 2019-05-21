@@ -2,7 +2,7 @@
  |  tail.writer - A flexible and comfortable markup editor, written in vanilla JavaScript!
  |  @file       ./langs/tail.writer-all.js
  |  @author     SamBrishes <sam@pytes.net>
- |  @version    0.4.0 - Beta
+ |  @version    0.4.1 - Beta
  |
  |  @website    https://github.com/pytesNET/tail.writer
  |  @license    X11 / MIT License
@@ -22,6 +22,10 @@
     "use strict";
     var w = window, d = window.document, tail = writer.__helper;
 
+    /*
+     |  Translator:     SamBrishes - (https://www.pytes.net)
+     |  GitHub:         <internal>
+     */
     w.tail.writer.strings.register("de", {
         chars: "Zeichen",
         lines: "Zeilen",
@@ -109,7 +113,10 @@
         underline: "Unterstrichen"
     });
 
-    // Translator: Wojciech Jodla
+    /*
+     |  Translator:     Wojciech Jodla - (https://github.com/Joduai)
+     |  GitHub:         <internal>
+     */
     w.tail.writer.strings.register("pl", {
         chars: "Znaki",
         lines: "Linie",
