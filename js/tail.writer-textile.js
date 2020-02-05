@@ -680,10 +680,12 @@
             filter: function(_1, _2, _3, _s){
                 var count = this.previousLine();
                 if(count.substr && count.substr(0, 1) === "#"){
-                    count = count.replace(/[^\#]/g, "").split("").length;
+                    count = count.match(/^(\#)+/g);
+                    count = count===null?0:count[0].length;
                     count = (new Array(count)).join("#");
                 } else if(count.substr && count.substr(0, 1) === "*"){
-                    count = count.replace(/[^\*]/g, "").split("").length;
+                    count = count.match(/^(\*)+/g);
+                    count = count===null?0:count[0].length;
                     count = (new Array(count)).join("*");
                 } else {
                     return _2;
